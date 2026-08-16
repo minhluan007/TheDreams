@@ -1,42 +1,48 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class CameraMove : MonoBehaviour
 {
-    public float moveSpeed = 8f;
-    public float smoothTime = 0.15f;
+    public Transform target;
+    [Tooltip("Càng nhỏ camera càng bám sát player.")]
+    public float smoothTime = 0.05f;
+    public Vector3 offset = new Vector3(0f, 0f, -10f);
+    public float pixelsPerUnit = 16f;
 
-    private float targetX;
-    private float velocityX;
+    Vector3 smoothPosition;
+    Vector3 velocity;
+    bool initialized;
 
-    void Start()
+    void LateUpdate()
     {
-        targetX = transform.position.x;
-    }
+        if (target == null)
+            return;
 
-    void Update()
-    {
-        if (Keyboard.current.leftArrowKey.isPressed)
+        Vector3 desired = target.position + offset;
+
+        if (!initialized)
         {
-            targetX -= moveSpeed * Time.deltaTime;
+            smoothPosition = desired;
+            velocity = Vector3.zero;
+            initialized = true;
         }
 
-        if (Keyboard.current.rightArrowKey.isPressed)
-        {
-            targetX += moveSpeed * Time.deltaTime;
-        }
-
-        float newX = Mathf.SmoothDamp(
-            transform.position.x,
-            targetX,
-            ref velocityX,
+        // Smooth trên vị trí thật (không snap) để camera không bị trễ / giật.
+        smoothPosition = Vector3.SmoothDamp(
+            smoothPosition,
+            desired,
+            ref velocity,
             smoothTime
         );
 
-        transform.position = new Vector3(
-            newX,
-            transform.position.y,
-            transform.position.z
-        );
+        // Chỉ snap khi gán lên transform để pixel art không bị mờ.
+        transform.position = SnapToPixel(smoothPosition);
+    }
+
+    Vector3 SnapToPixel(Vector3 position)
+    {
+        float unitsPerPixel = 1f / pixelsPerUnit;
+        position.x = Mathf.Round(position.x / unitsPerPixel) * unitsPerPixel;
+        position.y = Mathf.Round(position.y / unitsPerPixel) * unitsPerPixel;
+        return position;
     }
 }
