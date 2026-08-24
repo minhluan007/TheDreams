@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 6db919e6d756608418a35e6c15dfd20a
+guid: 2c5ec28f4c6e295479534746881838b3
 ScriptedImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -72,7 +72,7 @@ ScriptedImporter:
     textureFormatSet: 0
     applyGammaDecoding: 0
   previousAsepriteImporterSettings:
-    fileImportMode: 1
+    fileImportMode: 2
     importHiddenLayers: 0
     layerImportMode: 1
     defaultPivotSpace: 0
@@ -87,7 +87,7 @@ ScriptedImporter:
     generateIndividualEvents: 1
     generateSpriteAtlas: 1
   asepriteImporterSettings:
-    fileImportMode: 1
+    fileImportMode: 2
     importHiddenLayers: 0
     layerImportMode: 1
     defaultPivotSpace: 0
@@ -126,10 +126,12 @@ ScriptedImporter:
     edges: []
     tessellationDetail: 0
     uvTransform: {x: 0, y: 0}
-  animatedSpriteImportData:
-  - name: House#1
+  animatedSpriteImportData: []
+  spriteSheetImportData: []
+  tileSetImportData:
+  - name: Tileset_0_1
     originalName: 
-    pivot: {x: 0.64154786, y: 0}
+    pivot: {x: 0.5, y: 0.5}
     alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
@@ -137,9 +139,9 @@ ScriptedImporter:
       serializedVersion: 2
       x: 4
       y: 4
-      width: 491
-      height: 400
-    spriteID: 4b6f771702743a544a5eb7614aa31d27
+      width: 16
+      height: 16
+    spriteID: ecf8e26df8217b1449d97702cbf83163
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -148,38 +150,102 @@ ScriptedImporter:
     edges: []
     tessellationDetail: 0
     uvTransform: {x: 4, y: 4}
-  spriteSheetImportData: []
-  tileSetImportData: []
+  - name: Tileset_0_2
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 9
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 4
+      y: 28
+      width: 16
+      height: 16
+    spriteID: 49dbfb2d0cfb5ce4bb034bef9ace1ca2
+    spriteBone: []
+    spriteOutline: []
+    vertices: []
+    spritePhysicsOutline: []
+    indices: 
+    edges: []
+    tessellationDetail: 0
+    uvTransform: {x: 4, y: 28}
+  - name: Tileset_0_3
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 9
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 28
+      y: 4
+      width: 16
+      height: 16
+    spriteID: e393e626f69542a43aa987a4b3d400a6
+    spriteBone: []
+    spriteOutline: []
+    vertices: []
+    spritePhysicsOutline: []
+    indices: 
+    edges: []
+    tessellationDetail: 0
+    uvTransform: {x: 28, y: 4}
   asepriteLayers:
   - layerIndex: 0
     uuid:
-      value0: 2873992046
+      value0: 4287466677
       value1: 0
       value2: 0
       value3: 0
     guid: 0
-    name: House#1
-    layerFlags: 0
-    layerType: 0
+    name: Layer 2
+    layerFlags: 3
+    layerType: 2
     blendMode: 0
-    cells:
-    - name: House#1
-      frameIndex: 0
-      additiveSortOrder: 0
-      cellRect:
-        x: 5
-        y: 0
-        width: 491
-        height: 400
-      spriteId: 4b6f771702743a544a5eb7614aa31d27
+    cells: []
     linkedCells: []
-    tileCells: []
+    tileCells:
+    - layerIndex: 0
+      frameIndex: 0
+      cellRect:
+        x: 0
+        y: 0
+        width: 32
+        height: 2
+      tileIndices: 01000000020000000200000001000000020000000200000001000000020000000200000001000000020000000200000001000000020000000200000001000000020000000200000001000000020000000200000001000000020000000200000001000000020000000200000001000000020000000200000001000000020000000100000003000000030000000100000003000000030000000100000003000000030000000100000003000000030000000100000003000000030000000100000003000000030000000100000003000000030000000100000003000000030000000100000003000000030000000100000003000000030000000100000003000000
     tileSetIndex: 0
     parentIndex: -1
-  tileSets: []
+  tileSets:
+  - id: 0
+    name: Tileset_0
+    tileSize:
+      x: 16
+      y: 16
+    tiles:
+    - tileId: 1
+      size:
+        x: 16
+        y: 16
+      name: Tileset_0_1
+      spriteId: ecf8e26df8217b1449d97702cbf83163
+    - tileId: 2
+      size:
+        x: 16
+        y: 16
+      name: Tileset_0_2
+      spriteId: 49dbfb2d0cfb5ce4bb034bef9ace1ca2
+    - tileId: 3
+      size:
+        x: 16
+        y: 16
+      name: Tileset_0_3
+      spriteId: e393e626f69542a43aa987a4b3d400a6
+    guid: -1102077067
   platformSettings: []
   generatePhysicsShape: 0
   secondarySpriteTextures: []
   spritePackingTag: 
-  canvasSize: {x: 640, y: 640}
-  previousTextureSize: {x: 512, y: 512}
+  canvasSize: {x: 512, y: 32}
+  previousTextureSize: {x: 64, y: 64}
