@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 public class InventoryUI : MonoBehaviour
 {
+    public static InventoryUI Instance;
     [SerializeField] private GameObject panel;
     [SerializeField] private Transform itemGrid;
     [SerializeField] private InventoryItemUI itemPrefab;
@@ -18,6 +19,11 @@ public class InventoryUI : MonoBehaviour
         bool isOpen = panel.activeSelf;
 
         panel.SetActive(!isOpen);
+
+        if(!isOpen)
+        {
+            Refresh();
+        }
 
         Debug.Log("Panel active: " + panel.activeSelf);
     }

@@ -16,7 +16,6 @@ public class InventoryManager : MonoBehaviour
 
     public void AddItem(ItemData item, int amount)
     {
-
         if (item == null)
         {
             Debug.LogError("AddItem: ItemData == null!");
@@ -54,5 +53,7 @@ public class InventoryManager : MonoBehaviour
         }
 
         Debug.LogWarning("Inventory đã đầy!");
+
+        InventoryUI.Instance.Refresh();
     }
 }
