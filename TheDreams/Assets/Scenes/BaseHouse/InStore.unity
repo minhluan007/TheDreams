@@ -155,6 +155,66 @@ PrefabInstance:
       propertyPath: m_Name
       value: ------ InventoryManager ------
       objectReference: {fileID: 0}
+    - target: {fileID: 2088280033340006302, guid: 3301955662848cf4d91f44911cffff9c, type: 3}
+      propertyPath: itemDatabase.Array.size
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2088280033340006302, guid: 3301955662848cf4d91f44911cffff9c, type: 3}
+      propertyPath: slots.Array.data[0].item
+      value: 
+      objectReference: {fileID: 11400000, guid: 5ecd8e82582f7b94da392ad29187b539, type: 2}
+    - target: {fileID: 2088280033340006302, guid: 3301955662848cf4d91f44911cffff9c, type: 3}
+      propertyPath: slots.Array.data[1].item
+      value: 
+      objectReference: {fileID: 11400000, guid: 54531358980005e41b882b277f458e33, type: 2}
+    - target: {fileID: 2088280033340006302, guid: 3301955662848cf4d91f44911cffff9c, type: 3}
+      propertyPath: slots.Array.data[2].item
+      value: 
+      objectReference: {fileID: 11400000, guid: 378a5cd70458a0141b8c493b66500bcc, type: 2}
+    - target: {fileID: 2088280033340006302, guid: 3301955662848cf4d91f44911cffff9c, type: 3}
+      propertyPath: slots.Array.data[3].item
+      value: 
+      objectReference: {fileID: 11400000, guid: 0f42357958b83874293a023eb0cbaa68, type: 2}
+    - target: {fileID: 2088280033340006302, guid: 3301955662848cf4d91f44911cffff9c, type: 3}
+      propertyPath: slots.Array.data[4].item
+      value: 
+      objectReference: {fileID: 11400000, guid: 4ead9881f5453af42ae2dc60d796f83e, type: 2}
+    - target: {fileID: 2088280033340006302, guid: 3301955662848cf4d91f44911cffff9c, type: 3}
+      propertyPath: 'itemDatabase.Array.data[0]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 5ecd8e82582f7b94da392ad29187b539, type: 2}
+    - target: {fileID: 2088280033340006302, guid: 3301955662848cf4d91f44911cffff9c, type: 3}
+      propertyPath: 'itemDatabase.Array.data[1]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 54531358980005e41b882b277f458e33, type: 2}
+    - target: {fileID: 2088280033340006302, guid: 3301955662848cf4d91f44911cffff9c, type: 3}
+      propertyPath: 'itemDatabase.Array.data[2]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 378a5cd70458a0141b8c493b66500bcc, type: 2}
+    - target: {fileID: 2088280033340006302, guid: 3301955662848cf4d91f44911cffff9c, type: 3}
+      propertyPath: 'itemDatabase.Array.data[3]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 0f42357958b83874293a023eb0cbaa68, type: 2}
+    - target: {fileID: 2088280033340006302, guid: 3301955662848cf4d91f44911cffff9c, type: 3}
+      propertyPath: 'itemDatabase.Array.data[4]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 4ead9881f5453af42ae2dc60d796f83e, type: 2}
+    - target: {fileID: 2088280033340006302, guid: 3301955662848cf4d91f44911cffff9c, type: 3}
+      propertyPath: slots.Array.data[1].amount
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 2088280033340006302, guid: 3301955662848cf4d91f44911cffff9c, type: 3}
+      propertyPath: slots.Array.data[2].amount
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 2088280033340006302, guid: 3301955662848cf4d91f44911cffff9c, type: 3}
+      propertyPath: slots.Array.data[3].amount
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 2088280033340006302, guid: 3301955662848cf4d91f44911cffff9c, type: 3}
+      propertyPath: slots.Array.data[4].amount
+      value: 20
+      objectReference: {fileID: 0}
     - target: {fileID: 3393767942529664879, guid: 3301955662848cf4d91f44911cffff9c, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -405,6 +465,37 @@ Transform:
   m_Children:
   - {fileID: 1916246863}
   - {fileID: 507389155}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &497156973
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 497156974}
+  m_Layer: 0
+  m_Name: ------ Shelving Unit ------
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &497156974
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 497156973}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -8.89049, y: -4.8087, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &507389154
@@ -947,3 +1038,4 @@ SceneRoots:
   - {fileID: 151652695}
   - {fileID: 100420479}
   - {fileID: 1105369696}
+  - {fileID: 497156974}

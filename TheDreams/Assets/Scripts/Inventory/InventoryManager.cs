@@ -7,7 +7,7 @@ public class InventoryManager : MonoBehaviour
 
     public List<InventorySlotData> slots = new();
 
-    [SerializeField] private ItemData testApple;
+    [SerializeField] private List<ItemData> itemDatabase = new();
 
     private void Awake()
     {

@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8e0a2cf2452502540a65888c0617ac41, type: 3}
-  m_Name: Item_Apple
+  m_Name: Item_Potato
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
-  itemId: food_apple
-  itemName: Apple
-  icon: {fileID: 6011783496695885252, guid: bfebe99549e397143b649c407a7b2ae2, type: 3}
-  maxStack: 99
+  itemId: vegetable_potato
+  itemName: Potato
+  icon: {fileID: -2951073624818672020, guid: 4dffbf2c34d864740ba4af2ebddc9aec, type: 3}
+  maxStack: 20
