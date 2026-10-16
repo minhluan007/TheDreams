@@ -14,6 +14,81 @@ public class InventoryManager : MonoBehaviour
         Instance = this;
     }
 
+
+    public void RemoveItem(ItemData item, int amount)
+    {
+        if (item == null)
+        {
+            Debug.LogError("RemoveItem: ItemData == null!");
+            return;
+        }
+        foreach (var slot in slots)
+        {
+            if (slot.item == item && slot.amount > 0)
+            {
+                slot.amount -= amount;
+                if (slot.amount <= 0)
+                    slots.Remove(slot);
+            }
+        }
+        InventoryUI.Instance.Refresh();
+    }
+
+    public void UpdateItem(ItemData item, int amount)
+    {
+        if (item == null)
+        {
+            Debug.LogError("EditItem: ItemData == null!");
+            return;
+        }
+        foreach (var slot in slots)
+        {
+            if (slot.item == item)
+            {
+                slot.amount = amount;
+                if (slot.amount <= 0)
+                    slots.Remove(slot);
+            }
+        }
+        InventoryUI.Instance.Refresh();
+    }
+
+    public void PlusItem(ItemData item, int amount)
+    {
+        if (item == null)
+        {
+            Debug.LogError("PlusItem: ItemData == null!");
+            return;
+        }
+        foreach (var slot in slots)
+        {
+            if (slot.item == item)
+            {
+                slot.amount += amount;
+            }
+        }
+        InventoryUI.Instance.Refresh();
+    }
+
+    public void MinusItem(ItemData item, int amount)
+    {
+        if (item == null)
+        {
+            Debug.LogError("MinusItem: ItemData == null!");
+            return;
+        }
+        foreach (var slot in slots)
+        {
+            if (slot.item == item && slot.amount > 0)
+            {
+                slot.amount -= amount;
+                if (slot.amount <= 0)
+                    slots.Remove(slot);
+            }
+        }
+        InventoryUI.Instance.Refresh();
+    }
+
     public void AddItem(ItemData item, int amount)
     {
         if (item == null)
