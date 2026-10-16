@@ -37,10 +37,11 @@ public class InventoryUI : MonoBehaviour
 
         foreach (var slot in InventoryManager.Instance.slots)
         {
-            InventoryItemUI itemUI =
-                Instantiate(itemPrefab, itemGrid);
+            InventoryItemUI itemUI = Instantiate(itemPrefab, itemGrid);
 
-            itemUI.SetData(slot);
+            if(slot.item != null){
+                itemUI.SetData(slot);
+            }
         }
     }
 }
