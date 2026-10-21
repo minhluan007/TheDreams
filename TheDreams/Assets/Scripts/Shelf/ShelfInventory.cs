@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ShelfInventory : MonoBehaviour
 {
-    [SerializeField] private int slotCount = 20;
+    [SerializeField] private int slotCount = 0;
 
     public List<InventorySlotData> slots = new();
 

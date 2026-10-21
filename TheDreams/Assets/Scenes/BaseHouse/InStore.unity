@@ -223,8 +223,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d82b31802c0e21419bb1245fd358aed, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ShelfInventory
-  slotCount: 20
-  slots: []
+  slotCount: 0
+  slots:
+  - item: {fileID: 0}
+    amount: 0
+  - item: {fileID: 0}
+    amount: 0
+  - item: {fileID: 0}
+    amount: 0
+  - item: {fileID: 0}
+    amount: 0
+  - item: {fileID: 0}
+    amount: 0
+  - item: {fileID: 0}
+    amount: 0
 --- !u!1001 &100420479
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -233,6 +245,38 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 412480774070683085, guid: 3301955662848cf4d91f44911cffff9c, type: 3}
+      propertyPath: m_Spacing.x
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 412480774070683085, guid: 3301955662848cf4d91f44911cffff9c, type: 3}
+      propertyPath: m_Spacing.y
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 412480774070683085, guid: 3301955662848cf4d91f44911cffff9c, type: 3}
+      propertyPath: m_CellSize.x
+      value: 16
+      objectReference: {fileID: 0}
+    - target: {fileID: 412480774070683085, guid: 3301955662848cf4d91f44911cffff9c, type: 3}
+      propertyPath: m_CellSize.y
+      value: 16
+      objectReference: {fileID: 0}
+    - target: {fileID: 412480774070683085, guid: 3301955662848cf4d91f44911cffff9c, type: 3}
+      propertyPath: m_Padding.m_Top
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 412480774070683085, guid: 3301955662848cf4d91f44911cffff9c, type: 3}
+      propertyPath: m_Padding.m_Left
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 412480774070683085, guid: 3301955662848cf4d91f44911cffff9c, type: 3}
+      propertyPath: m_Padding.m_Right
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 412480774070683085, guid: 3301955662848cf4d91f44911cffff9c, type: 3}
+      propertyPath: m_Padding.m_Bottom
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 1187933469363598361, guid: 3301955662848cf4d91f44911cffff9c, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -261,65 +305,21 @@ PrefabInstance:
       propertyPath: m_Name
       value: ------ InventoryManager ------
       objectReference: {fileID: 0}
-    - target: {fileID: 2088280033340006302, guid: 3301955662848cf4d91f44911cffff9c, type: 3}
-      propertyPath: itemDatabase.Array.size
-      value: 5
+    - target: {fileID: 1899038554066858546, guid: 3301955662848cf4d91f44911cffff9c, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: -5.3671
       objectReference: {fileID: 0}
-    - target: {fileID: 2088280033340006302, guid: 3301955662848cf4d91f44911cffff9c, type: 3}
-      propertyPath: slots.Array.data[0].item
-      value: 
-      objectReference: {fileID: 11400000, guid: 5ecd8e82582f7b94da392ad29187b539, type: 2}
-    - target: {fileID: 2088280033340006302, guid: 3301955662848cf4d91f44911cffff9c, type: 3}
-      propertyPath: slots.Array.data[1].item
-      value: 
-      objectReference: {fileID: 11400000, guid: 54531358980005e41b882b277f458e33, type: 2}
-    - target: {fileID: 2088280033340006302, guid: 3301955662848cf4d91f44911cffff9c, type: 3}
-      propertyPath: slots.Array.data[2].item
-      value: 
-      objectReference: {fileID: 11400000, guid: 378a5cd70458a0141b8c493b66500bcc, type: 2}
-    - target: {fileID: 2088280033340006302, guid: 3301955662848cf4d91f44911cffff9c, type: 3}
-      propertyPath: slots.Array.data[3].item
-      value: 
-      objectReference: {fileID: 11400000, guid: 0f42357958b83874293a023eb0cbaa68, type: 2}
-    - target: {fileID: 2088280033340006302, guid: 3301955662848cf4d91f44911cffff9c, type: 3}
-      propertyPath: slots.Array.data[4].item
-      value: 
-      objectReference: {fileID: 11400000, guid: 4ead9881f5453af42ae2dc60d796f83e, type: 2}
-    - target: {fileID: 2088280033340006302, guid: 3301955662848cf4d91f44911cffff9c, type: 3}
-      propertyPath: 'itemDatabase.Array.data[0]'
-      value: 
-      objectReference: {fileID: 11400000, guid: 5ecd8e82582f7b94da392ad29187b539, type: 2}
-    - target: {fileID: 2088280033340006302, guid: 3301955662848cf4d91f44911cffff9c, type: 3}
-      propertyPath: 'itemDatabase.Array.data[1]'
-      value: 
-      objectReference: {fileID: 11400000, guid: 54531358980005e41b882b277f458e33, type: 2}
-    - target: {fileID: 2088280033340006302, guid: 3301955662848cf4d91f44911cffff9c, type: 3}
-      propertyPath: 'itemDatabase.Array.data[2]'
-      value: 
-      objectReference: {fileID: 11400000, guid: 378a5cd70458a0141b8c493b66500bcc, type: 2}
-    - target: {fileID: 2088280033340006302, guid: 3301955662848cf4d91f44911cffff9c, type: 3}
-      propertyPath: 'itemDatabase.Array.data[3]'
-      value: 
-      objectReference: {fileID: 11400000, guid: 0f42357958b83874293a023eb0cbaa68, type: 2}
-    - target: {fileID: 2088280033340006302, guid: 3301955662848cf4d91f44911cffff9c, type: 3}
-      propertyPath: 'itemDatabase.Array.data[4]'
-      value: 
-      objectReference: {fileID: 11400000, guid: 4ead9881f5453af42ae2dc60d796f83e, type: 2}
-    - target: {fileID: 2088280033340006302, guid: 3301955662848cf4d91f44911cffff9c, type: 3}
-      propertyPath: slots.Array.data[1].amount
-      value: 20
+    - target: {fileID: 1899038554066858546, guid: 3301955662848cf4d91f44911cffff9c, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: -23.0847
       objectReference: {fileID: 0}
-    - target: {fileID: 2088280033340006302, guid: 3301955662848cf4d91f44911cffff9c, type: 3}
-      propertyPath: slots.Array.data[2].amount
-      value: 20
+    - target: {fileID: 1899038554066858546, guid: 3301955662848cf4d91f44911cffff9c, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -0.14120102
       objectReference: {fileID: 0}
-    - target: {fileID: 2088280033340006302, guid: 3301955662848cf4d91f44911cffff9c, type: 3}
-      propertyPath: slots.Array.data[3].amount
-      value: 20
-      objectReference: {fileID: 0}
-    - target: {fileID: 2088280033340006302, guid: 3301955662848cf4d91f44911cffff9c, type: 3}
-      propertyPath: slots.Array.data[4].amount
-      value: 20
+    - target: {fileID: 1899038554066858546, guid: 3301955662848cf4d91f44911cffff9c, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -6.4577
       objectReference: {fileID: 0}
     - target: {fileID: 2820837742167920504, guid: 3301955662848cf4d91f44911cffff9c, type: 3}
       propertyPath: m_AnchorMax.y
