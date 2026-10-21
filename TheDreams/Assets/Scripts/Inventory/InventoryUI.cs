@@ -28,6 +28,13 @@ public class InventoryUI : MonoBehaviour
         Debug.Log("Panel active: " + panel.activeSelf);
     }
 
+    public void Open()
+    {
+        panel.SetActive(true);
+        Refresh();
+    }
+
+ 
     public void Refresh()
     {
         foreach (Transform child in itemGrid)
@@ -35,13 +42,32 @@ public class InventoryUI : MonoBehaviour
             Destroy(child.gameObject);
         }
 
-        foreach (var slot in InventoryManager.Instance.slots)
+        for (int i = 0; i < InventoryManager.Instance.slots.Count; i++)
         {
+            int index = i;
+            var slot = InventoryManager.Instance.slots[index];
+
             InventoryItemUI itemUI = Instantiate(itemPrefab, itemGrid);
 
-            if(slot.item != null){
+            if (slot.item != null)
+            {
+                if (ShelfUI.Instance != null && ShelfUI.Instance.IsOpen)
+                {
+                    itemUI.SetData(
+                        slot,
+                        () => ShelfUI.Instance.MoveFromInventory(index)
+                    );
+                }
+                else
+                {
+                    itemUI.SetData(slot);
+                }
+            }
+            else
+            {
                 itemUI.SetData(slot);
             }
         }
     }
+
 }

@@ -6,9 +6,11 @@ public class ShelfUI : MonoBehaviour
     public static ShelfUI Instance;
 
     [SerializeField] private GameObject shelfPanel;
-    [SerializeField] private Transform shelfList;
     [SerializeField] private Transform shelfGrid;
+    [SerializeField] private Transform inventoryGrid;
     [SerializeField] private InventoryItemUI itemPrefab;
+    [SerializeField] private InventoryUI inventoryUI;
+    
 
     private ShelfInventory currentShelf;
 
@@ -39,6 +41,7 @@ public class ShelfUI : MonoBehaviour
 
         currentShelf = shelf;
         shelfPanel.SetActive(true);
+        inventoryUI?.Open();
 
         // Mở UI kệ thì ẩn InventoryPanel độc lập nếu đang mở.
         // Hai vùng item sẽ được hiển thị trong ShelfPanel.
@@ -65,15 +68,36 @@ public class ShelfUI : MonoBehaviour
         if (currentShelf == null ||
             InventoryManager.Instance == null ||
             itemPrefab == null ||
-            shelfGrid == null)
+            shelfGrid == null ||
+            inventoryGrid == null)
             return;
 
         ClearGrid(shelfGrid);
 
         for (int i = 0; i < currentShelf.slots.Count; i++)
         {
+            int index = i;
+
             var ui = Instantiate(itemPrefab, shelfGrid);
-            ui.SetData(currentShelf.slots[i]);
+
+            ui.SetData(
+                currentShelf.slots[index],
+                () => MoveFromShelf(index)
+            );
+        }
+
+        ClearGrid(inventoryGrid);
+
+        for (int i = 0; i < InventoryManager.Instance.slots.Count; i++)
+        {
+            int index = i;
+
+            var ui = Instantiate(itemPrefab, inventoryGrid);
+
+            ui.SetData(
+                InventoryManager.Instance.slots[index],
+                () => MoveFromInventory(index)
+            );
         }
     }
 

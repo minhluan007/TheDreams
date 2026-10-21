@@ -21,63 +21,47 @@ public static class InventoryTransfer
             return false;
 
         ItemData item = from.item;
-        int amount = from.amount;
+        const int amountToMove = 1;
         int maxStack = Mathf.Max(1, item.maxStack);
 
-        int capacity = 0;
-
         foreach (var slot in destination)
         {
-            if (slot == null || slot.item == null)
-            {
-                capacity += maxStack;
-            }
-            else if (slot.item == item)
-            {
-                capacity += Mathf.Max(0, maxStack - slot.amount);
-            }
-        }
-
-        // Chỉ chuyển khi kho đích chứa được toàn bộ stack.
-        if (capacity < amount)
-            return false;
-
-        foreach (var slot in destination)
-        {
-            if (slot.item != item)
+            if (slot == null || slot.item != item)
                 continue;
 
-            int available = maxStack - slot.amount;
-            int moved = Mathf.Min(available, amount);
-
-            if (moved <= 0)
+            if (slot.amount >= maxStack)
                 continue;
 
-            slot.amount += moved;
-            amount -= moved;
+            slot.amount += amountToMove;
+            from.amount -= amountToMove;
 
-            if (amount == 0)
-                break;
+            if (from.amount <= 0)
+            {
+                from.item = null;
+                from.amount = 0;
+            }
+
+            return true;
         }
 
         foreach (var slot in destination)
         {
-            if (slot.item != null)
+            if (slot == null || slot.item != null)
                 continue;
-
-            int moved = Mathf.Min(maxStack, amount);
 
             slot.item = item;
-            slot.amount = moved;
-            amount -= moved;
+            slot.amount = amountToMove;
+            from.amount -= amountToMove;
 
-            if (amount == 0)
-                break;
+            if (from.amount <= 0)
+            {
+                from.item = null;
+                from.amount = 0;
+            }
+
+            return true;
         }
 
-        from.item = null;
-        from.amount = 0;
-
-        return true;
+        return false;
     }
 }
