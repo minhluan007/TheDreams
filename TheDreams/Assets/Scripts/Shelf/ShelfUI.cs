@@ -10,7 +10,6 @@ public class ShelfUI : MonoBehaviour
     [SerializeField] private Transform inventoryGrid;
     [SerializeField] private InventoryItemUI itemPrefab;
     [SerializeField] private InventoryUI inventoryUI;
-    
 
     private ShelfInventory currentShelf;
 
@@ -99,6 +98,8 @@ public class ShelfUI : MonoBehaviour
                 () => MoveFromInventory(index)
             );
         }
+
+        currentShelf.RefreshVisuals();
     }
 
     public void MoveFromShelf(int index)
