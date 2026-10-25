@@ -49,17 +49,20 @@ public class AutoDoor : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("Player"))
-        {
+        if (IsActor(other))
             isOpen = true;
-        }
     }
 
     private void OnTriggerExit2D(Collider2D other)
     {
-        if (other.CompareTag("Player"))
-        {
+        if (IsActor(other))
             isOpen = false;
-        }
+    }
+
+    static bool IsActor(Collider2D other)
+    {
+        return other.CompareTag("Player")
+            || other.CompareTag(NPC.TagName)
+            || other.GetComponent<NPC>() != null;
     }
 }
