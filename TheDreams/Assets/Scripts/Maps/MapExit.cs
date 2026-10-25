@@ -5,6 +5,9 @@ public class MapExit : MonoBehaviour
     [SerializeField] private string targetScene;
     [SerializeField] private string targetSpawnPoint;
 
+    public string TargetScene => targetScene;
+    public string TargetSpawnPoint => targetSpawnPoint;
+
     private bool canTransition = false;
     private bool isTransitioning = false;
 

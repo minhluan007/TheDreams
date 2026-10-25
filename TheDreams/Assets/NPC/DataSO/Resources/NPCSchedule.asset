@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f3c8a1d64e7b49c0a2d5e8f1b6c90473, type: 3}
+  m_Name: NPCSchedule
+  m_EditorClassIdentifier: Assembly-CSharp::NPCScheduleTable
+  sheet: '# id | prefab | map | spawn | di | destroy | xuat hien | roi di
+
+    customer_02
+    | NPC | BaseStore | Spawn_FromStreet | WP_Street_2, WP_Door | Exit_ToStore |
+    9:00 | 17:30'
+  entries:
+  - npcId: customer_02
+    prefab: {fileID: 1000000001, guid: a2b5880c9b24200449aaccac00357837, type: 3}
+    prefabName: NPC
+    mapName: BaseStore
+    spawnPointName: Spawn_FromStreet
+    walkPoints: WP_Street_2, WP_Door
+    destroyPointName: Exit_ToStore
+    appearTime: 9:00
+    leaveTime: 17:30
+  - npcId: customer_02
+    prefab: {fileID: 1000000001, guid: a2b5880c9b24200449aaccac00357837, type: 3}
+    prefabName: NPC
+    mapName: InStore
+    spawnPointName: Spawn_FromStreet
+    walkPoints: WP_Shelf, WP_Entrance
+    destroyPointName: Exit_ToStore
+    appearTime: 9:00
+    leaveTime: 17:30
