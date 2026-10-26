@@ -341,6 +341,50 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: -6.4577
       objectReference: {fileID: 0}
+    - target: {fileID: 2088280033340006302, guid: 3301955662848cf4d91f44911cffff9c, type: 3}
+      propertyPath: slots.Array.size
+      value: 18
+      objectReference: {fileID: 0}
+    - target: {fileID: 2088280033340006302, guid: 3301955662848cf4d91f44911cffff9c, type: 3}
+      propertyPath: slots.Array.data[0].item
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2088280033340006302, guid: 3301955662848cf4d91f44911cffff9c, type: 3}
+      propertyPath: slots.Array.data[1].item
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2088280033340006302, guid: 3301955662848cf4d91f44911cffff9c, type: 3}
+      propertyPath: slots.Array.data[2].item
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2088280033340006302, guid: 3301955662848cf4d91f44911cffff9c, type: 3}
+      propertyPath: slots.Array.data[3].item
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2088280033340006302, guid: 3301955662848cf4d91f44911cffff9c, type: 3}
+      propertyPath: slots.Array.data[4].item
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2088280033340006302, guid: 3301955662848cf4d91f44911cffff9c, type: 3}
+      propertyPath: slots.Array.data[0].amount
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2088280033340006302, guid: 3301955662848cf4d91f44911cffff9c, type: 3}
+      propertyPath: slots.Array.data[1].amount
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2088280033340006302, guid: 3301955662848cf4d91f44911cffff9c, type: 3}
+      propertyPath: slots.Array.data[2].amount
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2088280033340006302, guid: 3301955662848cf4d91f44911cffff9c, type: 3}
+      propertyPath: slots.Array.data[3].amount
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2088280033340006302, guid: 3301955662848cf4d91f44911cffff9c, type: 3}
+      propertyPath: slots.Array.data[4].amount
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2820837742167920504, guid: 3301955662848cf4d91f44911cffff9c, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0

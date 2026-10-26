@@ -22,16 +22,8 @@ public class InventoryManager : MonoBehaviour
             Debug.LogError("RemoveItem: ItemData == null!");
             return;
         }
-        foreach (var slot in slots)
-        {
-            if (slot.item == item && slot.amount > 0)
-            {
-                slot.amount -= amount;
-                if (slot.amount <= 0)
-                    slots.Remove(slot);
-            }
-        }
-        InventoryUI.Instance.Refresh();
+        Consume(item, amount);
+        RefreshUI();
     }
 
     public void UpdateItem(ItemData item, int amount)
@@ -43,14 +35,14 @@ public class InventoryManager : MonoBehaviour
         }
         foreach (var slot in slots)
         {
-            if (slot.item == item)
-            {
-                slot.amount = amount;
-                if (slot.amount <= 0)
-                    slots.Remove(slot);
-            }
+            if (slot == null || slot.item != item)
+                continue;
+
+            slot.amount = amount;
+            if (slot.amount <= 0)
+                ClearSlot(slot);
         }
-        InventoryUI.Instance.Refresh();
+        RefreshUI();
     }
 
     public void PlusItem(ItemData item, int amount)
@@ -62,12 +54,12 @@ public class InventoryManager : MonoBehaviour
         }
         foreach (var slot in slots)
         {
-            if (slot.item == item)
-            {
-                slot.amount += amount;
-            }
+            if (slot == null || slot.item != item)
+                continue;
+
+            slot.amount += amount;
         }
-        InventoryUI.Instance.Refresh();
+        RefreshUI();
     }
 
     public void MinusItem(ItemData item, int amount)
@@ -77,58 +69,96 @@ public class InventoryManager : MonoBehaviour
             Debug.LogError("MinusItem: ItemData == null!");
             return;
         }
-        foreach (var slot in slots)
-        {
-            if (slot.item == item && slot.amount > 0)
-            {
-                slot.amount -= amount;
-                if (slot.amount <= 0)
-                    slots.Remove(slot);
-            }
-        }
-        InventoryUI.Instance.Refresh();
+
+        Consume(item, amount);
+        RefreshUI();
     }
 
-    public void AddItem(ItemData item, int amount)
+    public int AddItem(ItemData item, int amount)
     {
         if (item == null)
         {
             Debug.LogError("AddItem: ItemData == null!");
-            return;
+            return 0;
         }
 
-        // Tìm stack đang có
+        if (amount <= 0)
+            return 0;
+
+        int remaining = amount;
+        int maxStack = Mathf.Max(1, item.maxStack);
+
         foreach (var slot in slots)
         {
-            if (slot.item == item && slot.amount < item.maxStack)
+            if (slot == null || slot.item != item || slot.amount >= maxStack)
+                continue;
+
+            int addAmount = Mathf.Min(maxStack - slot.amount, remaining);
+            slot.amount += addAmount;
+            remaining -= addAmount;
+
+            if (remaining <= 0)
+                break;
+        }
+
+        if (remaining > 0)
+        {
+            foreach (var slot in slots)
             {
-                int space = item.maxStack - slot.amount;
-                int addAmount = Mathf.Min(space, amount);
+                if (slot == null || (slot.item != null && slot.amount > 0))
+                    continue;
 
-                slot.amount += addAmount;
-                amount -= addAmount;
+                int addAmount = Mathf.Min(maxStack, remaining);
+                slot.item = item;
+                slot.amount = addAmount;
+                remaining -= addAmount;
 
-                if (amount <= 0)
-                    return;
+                if (remaining <= 0)
+                    break;
             }
         }
 
-        // Tạo slot mới
-        while (amount > 0)
+        int added = amount - remaining;
+
+        if (added <= 0)
+            Debug.LogWarning("Inventory đã đầy!");
+        else
+            RefreshUI();
+
+        return added;
+    }
+
+    private void Consume(ItemData item, int amount)
+    {
+        if (amount <= 0)
+            return;
+
+        foreach (var slot in slots)
         {
-            int addAmount = Mathf.Min(amount, item.maxStack);
+            if (slot == null || slot.item != item || slot.amount <= 0)
+                continue;
 
-            slots.Add(new InventorySlotData
-            {
-                item = item,
-                amount = addAmount
-            });
+            int removeAmount = Mathf.Min(slot.amount, amount);
+            slot.amount -= removeAmount;
+            amount -= removeAmount;
 
-            amount -= addAmount;
+            if (slot.amount <= 0)
+                ClearSlot(slot);
+
+            if (amount <= 0)
+                return;
         }
+    }
 
-        Debug.LogWarning("Inventory đã đầy!");
+    private static void ClearSlot(InventorySlotData slot)
+    {
+        slot.item = null;
+        slot.amount = 0;
+    }
 
-        InventoryUI.Instance.Refresh();
+    private static void RefreshUI()
+    {
+        if (InventoryUI.Instance != null)
+            InventoryUI.Instance.Refresh();
     }
 }
