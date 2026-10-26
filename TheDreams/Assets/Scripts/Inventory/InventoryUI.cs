@@ -7,6 +7,11 @@ public class InventoryUI : MonoBehaviour
     [SerializeField] private Transform itemGrid;
     [SerializeField] private InventoryItemUI itemPrefab;
 
+    private void Awake()
+    {
+        Instance = this;
+    }
+
     private void Start()
     {
         panel.SetActive(false);
@@ -37,6 +42,9 @@ public class InventoryUI : MonoBehaviour
  
     public void Refresh()
     {
+        if (itemGrid == null || InventoryManager.Instance == null)
+            return;
+
         foreach (Transform child in itemGrid)
         {
             Destroy(child.gameObject);
