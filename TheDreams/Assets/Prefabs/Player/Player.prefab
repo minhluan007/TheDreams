@@ -60,7 +60,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 739c387869c3c844493850a8d16627a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMove
-  moveSpeed: 5
+  moveSpeed: 3.5
   animator: {fileID: 8049237684830476431}
   rb: {fileID: 6070399220333265388}
   inputActions: {fileID: 0}
