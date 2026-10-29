@@ -84,6 +84,7 @@ MonoBehaviour:
   walkToExitWhenRouteEnds: 1
   spawnIgnoreSeconds: 0.5
   leaveHour: -1
+  destroyPointName: 
 --- !u!50 &1000000006
 Rigidbody2D:
   serializedVersion: 5
@@ -171,9 +172,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::NPCHierarchyGuide
   hierarchyNotes: 'HIERARCHY NPC (chua co art)
 
-    Drag prefab nay vao scene hoac de NPCManager spawn luc Play.
+    Drag prefab nay vao scene hoac
+    de NPCManager spawn luc Play.
 
-    Gan sprite vao Sprite_NPC / Animator clip Run-Idle.'
+    Gan sprite vao Sprite_NPC / Animator clip
+    Run-Idle.'
 --- !u!1 &1000000010
 GameObject:
   m_ObjectHideFlags: 0
@@ -258,38 +261,16 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 9040514489429057777, guid: 089bc4472c7d8e34f9514f3df244a7b4, type: 3}
   m_Color: {r: 0.85, g: 0.35, b: 0.7, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1, y: 2}
+  m_Size: {x: 2, y: 4}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 0
+  m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 1
---- !u!95 &1000000014
-Animator:
-  serializedVersion: 7
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1000000010}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 0}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_AnimatePhysics: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
 --- !u!114 &1000000013
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -304,6 +285,28 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SortY
   offset: 0
   multiplier: 100
+--- !u!95 &1000000014
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1000000010}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: e7a48c014660b734fbeba49da7ed6052, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!114 &1000000015
 MonoBehaviour:
   m_ObjectHideFlags: 0
