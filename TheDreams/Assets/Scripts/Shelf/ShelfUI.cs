@@ -100,6 +100,15 @@ public class ShelfUI : MonoBehaviour
         }
 
         currentShelf.RefreshVisuals();
+        currentShelf.Remember();
+    }
+
+    public void NotifyShelfChanged(ShelfInventory shelf)
+    {
+        if (shelf == null || currentShelf != shelf || !IsOpen)
+            return;
+
+        Refresh();
     }
 
     public void MoveFromShelf(int index)

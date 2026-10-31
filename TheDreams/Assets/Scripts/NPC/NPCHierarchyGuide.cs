@@ -36,8 +36,12 @@ Giu nguyen:
     Spawn_FromStreet / Spawn_FromStore
 
 Lich NPC nam o Assets/NPC/DataSO/Resources/NPCSchedule.
-Moi dong text: id | prefab | map | spawn | di | destroy | xuat hien | roi di
-Ten diem la ten object trong scene. Gio de trong khi chua co dong ho.
-Sau khi sua text, bam Nap text vao bang. Toi diem destroy thi Destroy.
-Dong ho sau nay goi NPCManager.ReportHour.";
+Moi dong la mot chang, khong phai mot NPC moi:
+id | prefab | map | spawn | di | destroy | xuat hien | roi di | hanh vi
+Cung id, nhieu dong, dung thu tu = mot ngay.
+Hanh vi: di, xem, chon, mua, dung, ra.
+Dong ho bat dau luc dayStartHour. NPC chua toi gio thi chua co mat.
+Doi map khong reset: NPC tiep tuc dung chang dang lam.
+Xong chang nay thi sang chang sau (vao cua hang, roi ra).
+Neu ke co hang, chon se lay 1 mon. Ke trong thi xem roi bo di.";
 }

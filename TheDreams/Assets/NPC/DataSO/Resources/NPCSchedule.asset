@@ -12,11 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f3c8a1d64e7b49c0a2d5e8f1b6c90473, type: 3}
   m_Name: NPCSchedule
   m_EditorClassIdentifier: Assembly-CSharp::NPCScheduleTable
-  sheet: '# id | prefab | map | spawn | di | destroy | xuat hien | roi di
-
-    customer_02
-    | NPC | BaseStore | Spawn_FromStreet | WP_Street_2, WP_Door | Exit_ToStore |
-    9:00 | 17:30'
+  dayStartHour: 8.75
+  realSecondsPerGameHour: 20
+  sheet: '# id | prefab | map | spawn | di | destroy | xuat hien | roi di | hanh vi
+    customer_02 | NPC | BaseStore | Spawn_FromStreet | WP_Street_2, WP_Door | Exit_ToStore | 9:00 | 17:30 | di, ra
+    customer_02 | NPC | InStore | Spawn_FromStreet | WP_Entrance, WP_Shelf | Exit_ToStreet | 9:00 | 17:30 | xem, chon, mua, dung, ra
+    customer_03 | NPC | BaseStore | Spawn_FromStreet | WP_Street_2, WP_Door | Exit_ToStore | 11:00 | 17:30 | di, ra
+    customer_03 | NPC | InStore | Spawn_FromStreet | WP_Entrance, WP_Shelf | Exit_ToStreet | 11:00 | 17:30 | xem, chon, mua, ra'
   entries:
   - npcId: customer_02
     prefab: {fileID: 1000000001, guid: a2b5880c9b24200449aaccac00357837, type: 3}
@@ -27,12 +29,34 @@ MonoBehaviour:
     destroyPointName: Exit_ToStore
     appearTime: 9:00
     leaveTime: 17:30
+    actions: 'di, ra'
   - npcId: customer_02
     prefab: {fileID: 1000000001, guid: a2b5880c9b24200449aaccac00357837, type: 3}
     prefabName: NPC
     mapName: InStore
     spawnPointName: Spawn_FromStreet
-    walkPoints: WP_Shelf, WP_Entrance
-    destroyPointName: Exit_ToStore
+    walkPoints: WP_Entrance, WP_Shelf
+    destroyPointName: Exit_ToStreet
     appearTime: 9:00
     leaveTime: 17:30
+    actions: 'xem, chon, mua, dung, ra'
+  - npcId: customer_03
+    prefab: {fileID: 1000000001, guid: a2b5880c9b24200449aaccac00357837, type: 3}
+    prefabName: NPC
+    mapName: BaseStore
+    spawnPointName: Spawn_FromStreet
+    walkPoints: WP_Street_2, WP_Door
+    destroyPointName: Exit_ToStore
+    appearTime: 11:00
+    leaveTime: 17:30
+    actions: 'di, ra'
+  - npcId: customer_03
+    prefab: {fileID: 1000000001, guid: a2b5880c9b24200449aaccac00357837, type: 3}
+    prefabName: NPC
+    mapName: InStore
+    spawnPointName: Spawn_FromStreet
+    walkPoints: WP_Entrance, WP_Shelf
+    destroyPointName: Exit_ToStreet
+    appearTime: 11:00
+    leaveTime: 17:30
+    actions: 'xem, chon, mua, ra'

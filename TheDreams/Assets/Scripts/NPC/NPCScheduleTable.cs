@@ -15,9 +15,20 @@ public class NPCScheduleTable : ScriptableObject
     public const string ResourcePath = "NPCSchedule";
     public const string AssetPath = "Assets/NPC/DataSO/Resources/NPCSchedule.asset";
 
+    [Tooltip("Gio luc vao game (0-24). NPC chi xuat hien khi dong ho toi cot xuat hien.")]
+    [SerializeField] float dayStartHour = 8.75f;
+
+    [Tooltip("Giay that cho 1 gio trong game. 20 = tu 8:00 toi 9:00 mat 20 giay.")]
+    [SerializeField] float realSecondsPerGameHour = 20f;
+
     [TextArea(8, 20)]
-    [Tooltip("Moi dong 1 NPC. Cot cach nhau bang |. Dong bat dau bang # bi bo qua.\n\nid | prefab | map | spawn | di | destroy | xuat hien | roi di\n\nDiem di cach nhau dau phay. Gio de trong hoac - khi chua co dong ho.\nSau khi sua text, bam Nut text vao bang. Game doc danh sach ben duoi.")]
+    [Tooltip("Moi dong 1 chang cua NPC. Cung id, nhieu dong = mot ngay, dung thu tu.\nCot cach nhau bang |. Dong bat dau bang # bi bo qua.\n\nid | prefab | map | spawn | di | destroy | xuat hien | roi di | hanh vi\n\nHanh vi: di, xem, chon, mua, dung, ra. Cach nhau dau phay.\nDiem di cach nhau dau phay. Gio de trong hoac - neu di tiep ngay.\nSau khi sua text, bam Nap text vao bang.")]
     [SerializeField] string sheet;
+
+    public float DayStartHour => Mathf.Clamp(dayStartHour, 0f, 24f);
+
+    public float RealSecondsPerGameHour =>
+        realSecondsPerGameHour <= 0.01f ? 20f : realSecondsPerGameHour;
 
     [SerializeField] NPCScheduleEntry[] entries = Array.Empty<NPCScheduleEntry>();
 
@@ -59,11 +70,11 @@ public class NPCScheduleTable : ScriptableObject
     public static string BuildSheet(NPCScheduleEntry[] source)
     {
         if (source == null || source.Length == 0)
-            return "# id | prefab | map | spawn | di | destroy | xuat hien | roi di";
+            return "# id | prefab | map | spawn | di | destroy | xuat hien | roi di | hanh vi";
 
         var lines = new List<string>(source.Length + 1)
         {
-            "# id | prefab | map | spawn | di | destroy | xuat hien | roi di"
+            "# id | prefab | map | spawn | di | destroy | xuat hien | roi di | hanh vi"
         };
 
         for (int i = 0; i < source.Length; i++)
@@ -81,7 +92,8 @@ public class NPCScheduleTable : ScriptableObject
                 entry.walkPoints,
                 entry.destroyPointName,
                 entry.appearTime,
-                entry.leaveTime
+                entry.leaveTime,
+                entry.actions
             }));
         }
 
@@ -128,6 +140,7 @@ public class NPCScheduleTable : ScriptableObject
                 destroyPointName = Cell(cells, 5),
                 appearTime = Cell(cells, 6),
                 leaveTime = Cell(cells, 7),
+                actions = Cell(cells, 8),
                 prefab = FindPrefab(id, mapName, prefabName, previous)
             };
             parsed.Add(entry);
@@ -206,13 +219,33 @@ public class NPCScheduleEntry
     [Tooltip("Gio xuat hien. 8, 8:30, hoac de trong / - neu chua co dong ho.")]
     public string appearTime = "";
 
-    [Tooltip("Gio roi map. De trong / - thi di het duong roi destroy.")]
+    [Tooltip("Gio roi map. De trong / - thi xong hanh vi moi di. Toi gio nay thi cat ngang, ra cua.")]
     public string leaveTime = "";
+
+    [Tooltip("di, xem, chon, mua, dung, ra. Trong thi mac dinh di, ra.")]
+    public string actions = "";
 
     public float AppearHour => NPCScheduleTime.ParseHour(appearTime);
     public float LeaveHour => NPCScheduleTime.ParseHour(leaveTime);
 
     public string[] WalkPointNames => NPCScheduleTime.SplitNames(walkPoints);
+
+    string[] actionCache;
+    string actionCacheSource;
+
+    public string[] ActionNames
+    {
+        get
+        {
+            if (actionCache == null || actionCacheSource != actions)
+            {
+                actionCacheSource = actions;
+                actionCache = NPCScheduleTime.ActionsOf(actions);
+            }
+
+            return actionCache;
+        }
+    }
 
     public bool MatchesMap(string sceneName)
     {
@@ -283,6 +316,41 @@ public static class NPCScheduleTime
         }
 
         return names.ToArray();
+    }
+
+    public static string[] ActionsOf(string text)
+    {
+        string[] parts = SplitNames(text);
+        if (parts.Length == 0)
+            return new[] { "di", "ra" };
+
+        var actions = new string[parts.Length];
+        for (int i = 0; i < parts.Length; i++)
+            actions[i] = NormalizeAction(parts[i]);
+
+        return actions;
+    }
+
+    public static string NormalizeAction(string action)
+    {
+        if (string.IsNullOrWhiteSpace(action))
+            return "di";
+
+        string value = action.Trim().ToLowerInvariant().Replace('_', ' ');
+        if (value.StartsWith("chon") || value.StartsWith("chọn"))
+            return "chon";
+        if (value.StartsWith("mua"))
+            return "mua";
+        if (value.StartsWith("xem"))
+            return "xem";
+        if (value.StartsWith("dung") || value.StartsWith("đứng"))
+            return "dung";
+        if (value == "ra" || value.StartsWith("roi") || value.StartsWith("rời") || value.StartsWith("ra "))
+            return "ra";
+        if (value == "di" || value.StartsWith("di ") || value.StartsWith("đi"))
+            return "di";
+
+        return value;
     }
 
     static float ClampHour(float hour)

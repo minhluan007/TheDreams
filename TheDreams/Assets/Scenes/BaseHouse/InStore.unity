@@ -1012,13 +1012,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::NPCHierarchyGuide
   hierarchyNotes: 'HIERARCHY NPC InStore
 
-    Luc Play, NPCManager spawn NPC tai
-    day. NPC map khac khong di theo.
+    NPC vao cua sau khi xong chang duong.
+    Trong shop: xem, chon, mua, dung, ra Exit_ToStreet.
 
-    Het route thi ra cua va Destroy. leaveHour
-    >= 0 thi dao toi gio moi ra.
+    Doi map roi quay lai: NPC dung tiep cho cu,
+    khong spawn lai tu cua.
 
-    Can: Sprite_NPC art + Animator khi co images.'
+    Ke co hang thi mua 1 mon. Ke trong thi xem roi di.'
 --- !u!1 &880021010
 GameObject:
   m_ObjectHideFlags: 0

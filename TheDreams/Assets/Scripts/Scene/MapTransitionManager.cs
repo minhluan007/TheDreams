@@ -44,6 +44,9 @@ public class MapTransitionManager : MonoBehaviour
 
         yield return StartCoroutine(Fade(1f));
 
+        ShelfInventory.RememberLoaded();
+        NPCManager.StashActive();
+
         AsyncOperation operation =
             SceneManager.LoadSceneAsync(sceneName);
 

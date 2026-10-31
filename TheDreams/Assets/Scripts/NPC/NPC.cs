@@ -12,11 +12,16 @@ public class NPC : MonoBehaviour
 
     NPCMove move;
     NPCMapTraveler traveler;
+    NPCActor actor;
+    bool handedOff;
     static NPCScheduleEntry spawning;
+    static NPCActor spawningActor;
+    static bool spawningResumed;
 
     public string NpcId => npcId;
     public NPCMove Move => move;
     public NPCMapTraveler Traveler => traveler;
+    public NPCActor Actor => actor;
 
     void Reset()
     {
@@ -32,6 +37,7 @@ public class NPC : MonoBehaviour
 
         if (!NPCManager.Register(this))
         {
+            handedOff = true;
             Destroy(gameObject);
             return;
         }
@@ -39,11 +45,23 @@ public class NPC : MonoBehaviour
 
     void OnDestroy()
     {
+        if (actor != null && !handedOff && traveler != null)
+            traveler.WriteSnapshot(actor);
+
+        if (actor != null && actor.body == this)
+            actor.body = null;
+
         NPCManager.Unregister(this);
+    }
+
+    public void MarkHandedOff()
+    {
+        handedOff = true;
     }
 
     public void LeaveMap()
     {
+        handedOff = true;
         Destroy(gameObject);
     }
 
@@ -85,12 +103,35 @@ public class NPC : MonoBehaviour
         return npc;
     }
 
+    public static NPC CreateForActor(NPCActor life, Vector3 position, bool resumed)
+    {
+        if (life == null || life.Entry == null)
+            return null;
+
+        spawning = life.Entry;
+        spawningActor = life;
+        spawningResumed = resumed;
+        try
+        {
+            return CreateFromSchedule(life.Entry, position);
+        }
+        finally
+        {
+            spawning = null;
+            spawningActor = null;
+            spawningResumed = false;
+        }
+    }
+
     public static NPC CreateFromSchedule(NPCScheduleEntry entry, Vector3 position)
     {
         if (entry == null)
             return null;
 
-        spawning = entry;
+        bool ownSpawn = spawning == null;
+        if (ownSpawn)
+            spawning = entry;
+
         try
         {
             if (entry.prefab != null)
@@ -107,25 +148,28 @@ public class NPC : MonoBehaviour
         }
         finally
         {
-            spawning = null;
+            if (ownSpawn)
+                spawning = null;
         }
     }
 
     void ApplySpawningEntry()
     {
-        if (spawning == null)
+        if (spawning == null && spawningActor == null)
             return;
 
-        if (!string.IsNullOrWhiteSpace(spawning.npcId))
+        actor = spawningActor;
+        NPCScheduleEntry entry = spawning != null ? spawning : actor.Entry;
+        if (entry == null)
+            return;
+
+        if (!string.IsNullOrWhiteSpace(entry.npcId))
         {
-            npcId = spawning.npcId.Trim();
+            npcId = entry.npcId.Trim();
             gameObject.name = npcId;
         }
 
-        string[] walk = spawning.WalkPointNames;
-        if (walk.Length > 0)
-            move.BindNamedPoints(walk);
-
-        traveler.Configure(spawning.LeaveHour, spawning.destroyPointName);
+        if (actor != null && traveler != null)
+            traveler.Begin(actor, spawningResumed);
     }
 }

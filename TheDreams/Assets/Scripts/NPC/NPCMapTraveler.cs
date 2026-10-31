@@ -2,133 +2,222 @@ using UnityEngine;
 
 public class NPCMapTraveler : MonoBehaviour
 {
-    public enum Phase
-    {
-        Browse,
-        Leave
-    }
-
-    [SerializeField] bool transferOnMapExit = true;
-    [SerializeField] bool walkToExitWhenRouteEnds = true;
     [SerializeField] float spawnIgnoreSeconds = 0.5f;
-    [Tooltip("Gio ra (0-24). Am = ra ngay khi het route. Sau nay dong ho goi NPCManager.ReportHour.")]
-    [SerializeField] float leaveHour = -1f;
-    [SerializeField] string destroyPointName;
 
     NPC npc;
     NPCMove move;
-    MapExit seekingExit;
+    NPCActor actor;
     float ignoreUntil;
-    bool armed;
-    bool movingToDestroy;
-    bool clockActive;
-
-    public Phase CurrentPhase { get; private set; } = Phase.Browse;
-    public float LeaveHour => leaveHour;
+    bool seekingExit;
+    bool pendingAdvance;
+    bool pendingComplete;
 
     void Awake()
     {
-        npc = GetComponent<NPC>();
-        move = GetComponent<NPCMove>();
+        Cache();
     }
 
-    void Start()
+    void Cache()
     {
-        ArmAfterSpawn();
+        if (npc == null)
+            npc = GetComponent<NPC>();
+        if (move == null)
+            move = GetComponent<NPCMove>();
     }
 
-    public void ArmAfterSpawn()
+    public void Begin(NPCActor life, bool resumed)
     {
-        armed = false;
-        seekingExit = null;
-        CurrentPhase = Phase.Browse;
+        Cache();
+        actor = life;
+        pendingAdvance = false;
+        pendingComplete = false;
+        seekingExit = false;
         ignoreUntil = Time.time + spawnIgnoreSeconds;
-        move.ClearTarget();
+
+        Rigidbody2D rb = GetComponent<Rigidbody2D>();
+        if (rb != null)
+            rb.position = transform.position;
+
+        RefreshAction(resumed);
     }
 
-    public void Configure(float hour, string destroyName)
+    public void RefreshAction(bool resumed)
     {
-        leaveHour = hour;
-        destroyPointName = string.IsNullOrWhiteSpace(destroyName) ? null : destroyName.Trim();
-    }
-
-    public void ReportHour(float hour)
-    {
-        clockActive = true;
-        if (leaveHour >= 0f && hour >= leaveHour)
-            BeginLeave();
-    }
-
-    public void BeginLeave()
-    {
-        if (CurrentPhase == Phase.Leave)
+        Cache();
+        if (actor == null || move == null)
             return;
 
-        CurrentPhase = Phase.Leave;
-        SeekExit();
+        move.LockRoute();
+        seekingExit = false;
+        string action = actor.Action;
+
+        if (action == "di" || action == "xem")
+        {
+            move.SetPaused(false);
+            move.dwellOnArrival = action == "xem" ? NPCTiming.BrowsePause : 0f;
+            if (!move.BindNamedPoints(actor.Entry.WalkPointNames, actor.pointIndex))
+                pendingAdvance = true;
+            return;
+        }
+
+        if (action == "ra")
+        {
+            move.SetPaused(false);
+            move.dwellOnArrival = 0f;
+            return;
+        }
+
+        move.StopAndStay();
+        if (action == "chon" && !actor.looked)
+            ChooseItem();
+        else if (action == "mua" && !actor.purchaseDone)
+            BuyItem();
+        else if (action != "dung")
+            pendingAdvance = true;
+    }
+
+    public void WriteSnapshot(NPCActor snapshot)
+    {
+        if (snapshot == null)
+            return;
+
+        Cache();
+        snapshot.savedPosition = transform.position;
+        snapshot.savedMap = gameObject.scene.name;
+        snapshot.hasSavedPosition = true;
+        if (move != null)
+        {
+            snapshot.pointIndex = move.Index;
+            snapshot.reachedEnd = move.HasReachedEnd;
+            move.SetPaused(true);
+        }
+
+        snapshot.frozen = true;
     }
 
     void Update()
     {
-        if (!armed && Time.time >= ignoreUntil)
-            armed = true;
-
-        if (CurrentPhase == Phase.Leave)
+        if (actor == null)
         {
-            if (!movingToDestroy)
-                SeekExit();
-
-            if (movingToDestroy && move.HasReachedEnd)
-                Depart();
+            UpdateUnscheduled();
             return;
         }
 
-        if (clockActive && leaveHour >= 0f)
+        if (actor.frozen || actor.body != npc)
+        {
+            move.SetPaused(true);
+            return;
+        }
+
+        if (pendingComplete)
+        {
+            pendingComplete = false;
+            NPCManager.CompleteVisit(actor);
+            return;
+        }
+
+        if (pendingAdvance)
+        {
+            pendingAdvance = false;
+            NPCManager.AdvanceAction(actor);
+            return;
+        }
+
+        if (move.IsHolding)
             return;
 
-        if (!walkToExitWhenRouteEnds || !move.HasReachedEnd)
-            return;
+        switch (actor.Action)
+        {
+            case "di":
+            case "xem":
+                if (move.HasReachedEnd)
+                    NPCManager.AdvanceAction(actor);
+                break;
+            case "dung":
+                actor.timer += Time.deltaTime;
+                if (actor.timer >= NPCTiming.StandSeconds)
+                    NPCManager.AdvanceAction(actor);
+                break;
+            case "chon":
+                actor.timer += Time.deltaTime;
+                if (actor.timer >= NPCTiming.ChooseSeconds)
+                    NPCManager.AdvanceAction(actor);
+                break;
+            case "mua":
+                actor.timer += Time.deltaTime;
+                if (actor.timer >= NPCTiming.BuySeconds)
+                    NPCManager.AdvanceAction(actor);
+                break;
+            case "ra":
+                if (!seekingExit)
+                {
+                    seekingExit = true;
+                    if (!SeekExit())
+                        pendingComplete = true;
+                }
 
-        BeginLeave();
+                if (pendingComplete)
+                {
+                    pendingComplete = false;
+                    NPCManager.CompleteVisit(actor);
+                    return;
+                }
+
+                if (move.HasReachedEnd)
+                    NPCManager.CompleteVisit(actor);
+                break;
+        }
     }
 
-    void OnTriggerEnter2D(Collider2D other)
+    void ChooseItem()
     {
-        if (!transferOnMapExit || !armed)
+        actor.looked = true;
+        actor.wantsItem = false;
+        actor.shelfSlot = -1;
+        actor.shelfName = null;
+
+        ShelfInventory shelf = ShelfInventory.FindForNpc(transform.position);
+        if (shelf == null || !shelf.TryChooseSlot(out int slot, out _))
             return;
 
-        if (CurrentPhase != Phase.Leave && !string.IsNullOrEmpty(destroyPointName))
-            return;
-
-        if (clockActive && leaveHour >= 0f && CurrentPhase != Phase.Leave)
-            return;
-
-        MapExit exit = other.GetComponent<MapExit>();
-        if (exit == null)
-            return;
-
-        Depart();
+        actor.wantsItem = true;
+        actor.shelfSlot = slot;
+        actor.shelfName = shelf.gameObject.name;
+        move.FaceTowards(shelf.transform.position);
     }
 
-    void SeekExit()
+    void BuyItem()
+    {
+        actor.purchaseDone = true;
+        ShelfInventory shelf = ShelfInventory.FindNamed(actor.shelfName);
+        if (shelf == null)
+            shelf = ShelfInventory.FindForNpc(transform.position);
+
+        if (shelf == null || !shelf.TryTakeSlot(actor.shelfSlot, out string itemName))
+        {
+            actor.wantsItem = false;
+            return;
+        }
+
+        Debug.Log("NPC " + actor.id + " mua " + itemName + ".");
+    }
+
+    bool SeekExit()
     {
         Transform point = FindDestroyPoint();
         if (point == null)
-        {
-            Depart();
-            return;
-        }
+            return false;
 
-        movingToDestroy = true;
-        seekingExit = point.GetComponent<MapExit>();
         move.SetTarget(point.position);
+        return true;
     }
 
     Transform FindDestroyPoint()
     {
-        if (!string.IsNullOrEmpty(destroyPointName))
+        string destroyName = actor.Entry != null ? actor.Entry.destroyPointName : null;
+        if (!string.IsNullOrWhiteSpace(destroyName))
         {
-            GameObject named = GameObject.Find(destroyPointName);
+            GameObject named = GameObject.Find(destroyName.Trim());
             if (named != null)
                 return named.transform;
         }
@@ -137,11 +226,43 @@ public class NPCMapTraveler : MonoBehaviour
         return exit != null ? exit.transform : null;
     }
 
-    void Depart()
+    void OnTriggerEnter2D(Collider2D other)
     {
-        seekingExit = null;
-        if (npc != null)
+        if (actor == null || actor.body != npc || actor.frozen)
+            return;
+
+        if (Time.time < ignoreUntil || actor.Action != "ra")
+            return;
+
+        if (other.GetComponent<MapExit>() == null)
+            return;
+
+        NPCManager.CompleteVisit(actor);
+    }
+
+    void UpdateUnscheduled()
+    {
+        if (move.HasReachedEnd && !seekingExit)
+        {
+            seekingExit = true;
+            Transform point = FindLooseExit();
+            if (point == null)
+            {
+                npc.LeaveMap();
+                return;
+            }
+
+            move.SetTarget(point.position);
+        }
+
+        if (seekingExit && move.HasReachedEnd)
             npc.LeaveMap();
+    }
+
+    Transform FindLooseExit()
+    {
+        MapExit exit = FindExitOnCurrentMap();
+        return exit != null ? exit.transform : null;
     }
 
     MapExit FindExitOnCurrentMap()

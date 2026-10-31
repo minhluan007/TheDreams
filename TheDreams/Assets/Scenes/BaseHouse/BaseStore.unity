@@ -986,16 +986,14 @@ MonoBehaviour:
   hierarchyNotes: 'HIERARCHY NPC BaseStore
 
     Prefab: Assets/Prefabs/NPC/NPC.prefab
-    (keo vao day khi can).
 
-    Luc Play, NPCManager spawn NPC trong map nay. Toi
-    cua (Exit) thi Destroy, khong giu sang map khac.
+    NPC khong spawn luc moi vao game. Dong ho chay
+    tu dayStartHour, toi gio xuat hien moi di tu spawn
+    qua WP_Street toi Exit_ToStore, roi vao InStore.
 
-    Child Sprite_NPC: SpriteRenderer,
-    Animator, SortY.
+    Doi map giu dung cho dang di, khong reset route.
 
-    Route: NPC_Route_BaseStore (WP_Street_1 -> WP_Door gan
-    Exit_ToStore).'
+    Route: NPC_Route_BaseStore.'
 --- !u!1 &880011010
 GameObject:
   m_ObjectHideFlags: 0
