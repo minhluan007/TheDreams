@@ -13,6 +13,8 @@ public class MapTransitionManager : MonoBehaviour
     private string spawnPointName;
     private bool isLoading;
 
+    public bool IsLoading => isLoading;
+
     private void Awake()
     {
         if (Instance != null)
@@ -43,6 +45,10 @@ public class MapTransitionManager : MonoBehaviour
         isLoading = true;
 
         yield return StartCoroutine(Fade(1f));
+
+        InventoryManager.CaptureActive();
+        ShelfInventory.RememberLoaded();
+        NPCManager.StashActive();
 
         AsyncOperation operation =
             SceneManager.LoadSceneAsync(sceneName);

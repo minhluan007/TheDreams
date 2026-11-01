@@ -16,3 +16,4 @@ MonoBehaviour:
   itemName: Potato
   icon: {fileID: -2951073624818672020, guid: 4dffbf2c34d864740ba4af2ebddc9aec, type: 3}
   maxStack: 20
+  coinPrice: 15

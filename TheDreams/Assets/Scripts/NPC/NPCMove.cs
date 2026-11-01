@@ -13,25 +13,58 @@ public class NPCMove : MonoBehaviour
     int index;
     Vector2? overrideTarget;
     bool routeBound;
+    bool paused;
+    float holdUntil;
+    Vector2 currentMove;
 
     public bool HasReachedEnd { get; private set; }
+    public int Index => index;
+    public float dwellOnArrival;
+    public bool IsHolding => Time.time < holdUntil;
+
+    void Awake()
+    {
+        Cache();
+    }
 
     void Start()
+    {
+        Cache();
+
+        if (routeBound)
+            return;
+
+        NPC npc = GetComponent<NPC>();
+        if (npc != null && npc.Actor != null)
+            return;
+
+        BindRouteForScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
+    }
+
+    void Cache()
     {
         if (rb == null)
             rb = GetComponent<Rigidbody2D>();
 
         if (animator == null)
             animator = GetComponentInChildren<Animator>();
-
-        if (!routeBound)
-            BindRouteForScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
     }
 
-    public void BindNamedPoints(string[] names)
+    public void LockRoute()
     {
+        routeBound = true;
+    }
+
+    public bool BindNamedPoints(string[] names, int startIndex)
+    {
+        routeBound = true;
+        paused = false;
+        HasReachedEnd = false;
+        overrideTarget = null;
+        waypoints = null;
+
         if (names == null || names.Length == 0)
-            return;
+            return false;
 
         var found = new List<Vector2>(names.Length);
         for (int i = 0; i < names.Length; i++)
@@ -47,14 +80,25 @@ public class NPCMove : MonoBehaviour
         }
 
         if (found.Count == 0)
-            return;
+            return false;
 
-        routeBound = true;
-        waypoints = null;
         fallbackPoints = found.ToArray();
-        index = 0;
-        overrideTarget = null;
-        HasReachedEnd = false;
+        if (startIndex >= found.Count)
+        {
+            index = found.Count;
+            HasReachedEnd = true;
+        }
+        else
+        {
+            index = Mathf.Max(0, startIndex);
+        }
+
+        return true;
+    }
+
+    public void BindNamedPoints(string[] names)
+    {
+        BindNamedPoints(names, 0);
     }
 
     public void BindRouteForScene(string sceneName)
@@ -62,6 +106,7 @@ public class NPCMove : MonoBehaviour
         overrideTarget = null;
         HasReachedEnd = false;
         index = 0;
+        routeBound = true;
 
         NPCRoute route = NPCRoute.FindForScene(sceneName);
         if (route != null && route.HasPoints)
@@ -77,8 +122,10 @@ public class NPCMove : MonoBehaviour
 
     public void SetTarget(Vector2 worldPosition)
     {
+        routeBound = true;
         overrideTarget = worldPosition;
         HasReachedEnd = false;
+        paused = false;
     }
 
     public void ClearTarget()
@@ -86,10 +133,58 @@ public class NPCMove : MonoBehaviour
         overrideTarget = null;
     }
 
+    public void StopAndStay()
+    {
+        routeBound = true;
+        paused = true;
+        overrideTarget = null;
+        dwellOnArrival = 0f;
+        currentMove = Vector2.zero;
+        if (rb != null)
+            rb.linearVelocity = Vector2.zero;
+    }
+
+    public void SetPaused(bool value)
+    {
+        paused = value;
+        if (paused)
+        {
+            currentMove = Vector2.zero;
+            if (rb != null)
+                rb.linearVelocity = Vector2.zero;
+        }
+    }
+
+    public void Hold(float seconds)
+    {
+        if (seconds <= 0f)
+            return;
+
+        holdUntil = Time.time + seconds;
+        currentMove = Vector2.zero;
+        if (rb != null)
+            rb.linearVelocity = Vector2.zero;
+    }
+
+    public void ReleaseHold()
+    {
+        holdUntil = 0f;
+    }
+
+    public void FaceTowards(Vector2 world)
+    {
+        float dx = world.x - transform.position.x;
+        if (Mathf.Abs(dx) <= 0.01f)
+            return;
+
+        Vector3 scale = transform.localScale;
+        scale.x = Mathf.Abs(scale.x) * Mathf.Sign(dx);
+        transform.localScale = scale;
+    }
+
     void Update()
     {
-        Vector2 move = GetDesiredMove();
-        float speed = move.magnitude;
+        float speed = currentMove.magnitude;
         bool isMoving = speed > 0.01f;
 
         if (animator != null && animator.runtimeAnimatorController != null)
@@ -98,7 +193,7 @@ public class NPCMove : MonoBehaviour
             animator.SetFloat("Idle", isMoving ? 0f : 1f);
         }
 
-        SetDirection(move.x);
+        SetDirection(currentMove.x);
     }
 
     void FixedUpdate()
@@ -106,12 +201,15 @@ public class NPCMove : MonoBehaviour
         if (rb == null)
             return;
 
-        Vector2 move = GetDesiredMove();
-        rb.linearVelocity = move * moveSpeed;
+        currentMove = GetDesiredMove();
+        rb.linearVelocity = currentMove * moveSpeed;
     }
 
     Vector2 GetDesiredMove()
     {
+        if (paused || IsHolding)
+            return Vector2.zero;
+
         if (!TryGetDestination(out Vector2 destination))
             return Vector2.zero;
 
@@ -155,6 +253,12 @@ public class NPCMove : MonoBehaviour
         {
             overrideTarget = null;
             HasReachedEnd = true;
+            if (dwellOnArrival > 0f)
+            {
+                Hold(dwellOnArrival);
+                dwellOnArrival = 0f;
+            }
+
             return;
         }
 
@@ -162,6 +266,9 @@ public class NPCMove : MonoBehaviour
         int count = waypoints != null ? waypoints.Length
             : fallbackPoints != null ? fallbackPoints.Length
             : 0;
+
+        if (dwellOnArrival > 0f)
+            Hold(dwellOnArrival);
 
         if (index >= count)
             HasReachedEnd = true;

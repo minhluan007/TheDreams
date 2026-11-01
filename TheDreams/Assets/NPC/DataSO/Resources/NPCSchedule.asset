@@ -12,11 +12,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f3c8a1d64e7b49c0a2d5e8f1b6c90473, type: 3}
   m_Name: NPCSchedule
   m_EditorClassIdentifier: Assembly-CSharp::NPCScheduleTable
-  sheet: '# id | prefab | map | spawn | di | destroy | xuat hien | roi di
+  sheet: '# id | prefab | map | spawn | di | destroy | xuat hien | roi di | hanh
+    vi
 
-    customer_02
-    | NPC | BaseStore | Spawn_FromStreet | WP_Street_2, WP_Door | Exit_ToStore |
-    9:00 | 17:30'
+    customer_02 | NPC | BaseStore | Spawn_FromStreet | WP_Street_2, WP_Door
+    | Exit_ToStore | 7:00 | 8:00 | di
+
+    customer_02 | NPC | InStore | Spawn_FromStreet
+    | WP_Entrance, WP_Shelf | Exit_ToStreet | 8:00 | 15:00 | xem, chon, mua, doi,
+    tra, dung, xem, chon, doi, ra
+
+    customer_02 | NPC | BaseStore | Spawn_FromStore
+    | WP_Street_2, Spawn_FromStreet | Spawn_FromStreet | 15:00 | 17:00 | di'
   entries:
   - npcId: customer_02
     prefab: {fileID: 1000000001, guid: a2b5880c9b24200449aaccac00357837, type: 3}
@@ -25,14 +32,26 @@ MonoBehaviour:
     spawnPointName: Spawn_FromStreet
     walkPoints: WP_Street_2, WP_Door
     destroyPointName: Exit_ToStore
-    appearTime: 9:00
-    leaveTime: 17:30
+    appearTime: 7:00
+    leaveTime: 8:00
+    actions: di
   - npcId: customer_02
     prefab: {fileID: 1000000001, guid: a2b5880c9b24200449aaccac00357837, type: 3}
     prefabName: NPC
     mapName: InStore
     spawnPointName: Spawn_FromStreet
-    walkPoints: WP_Shelf, WP_Entrance
-    destroyPointName: Exit_ToStore
-    appearTime: 9:00
-    leaveTime: 17:30
+    walkPoints: WP_Entrance, WP_Shelf
+    destroyPointName: Exit_ToStreet
+    appearTime: 8:00
+    leaveTime: 15:00
+    actions: xem, chon, mua, doi, tra, dung, ra
+  - npcId: customer_02
+    prefab: {fileID: 1000000001, guid: a2b5880c9b24200449aaccac00357837, type: 3}
+    prefabName: NPC
+    mapName: BaseStore
+    spawnPointName: Spawn_FromStore
+    walkPoints: WP_Street_2, Spawn_FromStreet
+    destroyPointName: Spawn_FromStreet
+    appearTime: 15:00
+    leaveTime: 17:00
+    actions: di
