@@ -15,5 +15,9 @@ public class ItemData : ScriptableObject
    [Min(0)]
    public int coinPrice;
 
+   [TextArea(2, 8)]
+   [Tooltip("Mỗi lần xuống dòng là một dòng trên UI shop.")]
+   public string description;
+
    public string Label => string.IsNullOrEmpty(itemName) ? itemId : itemName;
 }
