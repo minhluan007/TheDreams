@@ -16,3 +16,4 @@ MonoBehaviour:
   itemName: Panda
   icon: {fileID: -8868641433794574911, guid: 4dffbf2c34d864740ba4af2ebddc9aec, type: 3}
   maxStack: 20
+  coinPrice: 90

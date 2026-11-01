@@ -15,6 +15,7 @@ public static class NPCTiming
     public const float ChooseSeconds = 2f;
     public const float BuySeconds = 1.1f;
     public const float StandSeconds = 1.4f;
+    public const float PayWaitSeconds = 3f;
 }
 
 public class NPCActor
@@ -31,11 +32,17 @@ public class NPCActor
     public Vector3 savedPosition;
     public string savedMap;
     public bool leaveRequested;
+    public bool fillingTime;
+    public bool forcedLeave;
+    public string fillAction;
+    public float fillDuration;
     public bool frozen;
     public bool completing;
     public bool wantsItem;
     public bool looked;
-    public bool purchaseDone;
+    public ItemData heldItem;
+    public bool itemPlaced;
+    public bool paid;
     public string shelfName;
     public int shelfSlot = -1;
     public NPC body;
@@ -57,6 +64,12 @@ public class NPCActor
     {
         get
         {
+            if (forcedLeave)
+                return "ra";
+
+            if (fillingTime && !string.IsNullOrEmpty(fillAction))
+                return fillAction;
+
             NPCScheduleEntry entry = Entry;
             if (entry == null || actionIndex < 0 || actionIndex >= entry.ActionNames.Length)
                 return string.Empty;
@@ -87,7 +100,6 @@ public class NPCActor
         pointIndex = 0;
         reachedEnd = false;
         hasSavedPosition = false;
-        purchaseDone = false;
         looked = false;
     }
 
@@ -95,10 +107,91 @@ public class NPCActor
     {
         actionIndex = 0;
         leaveRequested = false;
+        fillingTime = false;
+        forcedLeave = false;
+        fillAction = null;
+        fillDuration = 0f;
         frozen = false;
         wantsItem = false;
+        heldItem = null;
+        itemPlaced = false;
+        paid = false;
         shelfName = null;
         shelfSlot = -1;
         BeginAction();
+    }
+
+    public void BeginFill()
+    {
+        bool started = !fillingTime;
+        fillingTime = true;
+        forcedLeave = false;
+        actionIndex = 0;
+        PickFillAction();
+        BeginAction();
+
+        if (started && Entry != null)
+        {
+            Debug.Log("NPC " + id + " o lai " + Entry.mapName
+                + " den " + Entry.leaveTime + ".");
+        }
+    }
+
+    public void PickFillAction()
+    {
+        bool store = VisitLooksAroundStock();
+        bool canWalk = Entry != null && Entry.WalkPointNames.Length > 0;
+        int roll = Random.Range(0, 10);
+
+        if (!canWalk)
+        {
+            fillAction = store && roll < 4 ? "chon" : "dung";
+        }
+        else if (!store)
+        {
+            fillAction = roll < 3 ? "dung" : "di";
+        }
+        else if (roll < 5)
+        {
+            fillAction = "di";
+        }
+        else if (roll < 7)
+        {
+            fillAction = "xem";
+        }
+        else if (roll < 9)
+        {
+            fillAction = "dung";
+        }
+        else
+        {
+            fillAction = "chon";
+        }
+
+        if (fillAction == "dung")
+            fillDuration = Random.Range(1.4f, 3.4f);
+        else if (fillAction == "chon")
+            fillDuration = Random.Range(1.6f, 3f);
+        else if (fillAction == "xem")
+            fillDuration = NPCTiming.PointSeconds + NPCTiming.BrowsePause;
+        else
+            fillDuration = Random.Range(2.4f, 4.2f);
+    }
+
+    bool VisitLooksAroundStock()
+    {
+        NPCScheduleEntry entry = Entry;
+        if (entry == null)
+            return false;
+
+        string[] names = entry.ActionNames;
+        for (int i = 0; i < names.Length; i++)
+        {
+            string name = names[i];
+            if (name == "xem" || name == "chon" || name == "mua" || name == "doi" || name == "tra")
+                return true;
+        }
+
+        return false;
     }
 }

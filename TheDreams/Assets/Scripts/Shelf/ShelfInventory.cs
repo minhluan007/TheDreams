@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,8 +9,11 @@ public class ShelfInventory : MonoBehaviour
     public List<InventorySlotData> slots = new();
     public List<ShelfSlotItem> shelfSlotItem = new();
 
+    int stockEpoch;
+
     private void Awake()
     {
+        stockEpoch = ShelfStock.Epoch;
         EnsureSlots();
         ShelfStock.Apply(this);
         RefreshVisuals();
@@ -43,6 +47,9 @@ public class ShelfInventory : MonoBehaviour
 
     public void Remember()
     {
+        if (stockEpoch != ShelfStock.Epoch)
+            return;
+
         ShelfStock.Save(gameObject.scene.name, gameObject.name, slots);
     }
 
@@ -61,7 +68,7 @@ public class ShelfInventory : MonoBehaviour
         if (count == 0)
             return false;
 
-        int pick = Random.Range(0, count);
+        int pick = UnityEngine.Random.Range(0, count);
         for (int i = 0; i < slots.Count; i++)
         {
             InventorySlotData slot = slots[i];
@@ -81,9 +88,9 @@ public class ShelfInventory : MonoBehaviour
         return false;
     }
 
-    public bool TryTakeSlot(int index, out string itemName)
+    public bool TryTakeSlot(int index, out ItemData item)
     {
-        itemName = null;
+        item = null;
         if (slots == null || index < 0 || index >= slots.Count)
             return false;
 
@@ -91,7 +98,7 @@ public class ShelfInventory : MonoBehaviour
         if (slot == null || slot.item == null || slot.amount <= 0)
             return false;
 
-        itemName = string.IsNullOrEmpty(slot.item.itemName) ? slot.item.itemId : slot.item.itemName;
+        item = slot.item;
         slot.amount--;
         if (slot.amount <= 0)
         {
@@ -192,6 +199,20 @@ public class ShelfInventory : MonoBehaviour
             shelfSlotItem[i].UpdateSprite(hasItem ? data.item.icon : null);
         }
     }
+
+    public static void ApplyRemembered()
+    {
+        ShelfInventory[] shelves = FindObjectsByType<ShelfInventory>(FindObjectsSortMode.None);
+        for (int i = 0; i < shelves.Length; i++)
+        {
+            ShelfInventory shelf = shelves[i];
+            if (shelf == null)
+                continue;
+
+            ShelfStock.Apply(shelf);
+            shelf.RefreshVisuals();
+        }
+    }
 }
 
 public static class ShelfStock
@@ -204,6 +225,8 @@ public static class ShelfStock
     }
 
     static readonly List<Record> records = new List<Record>();
+
+    public static int Epoch { get; private set; }
 
     public static void Save(string sceneName, string shelfName, List<InventorySlotData> slots)
     {
@@ -271,9 +294,9 @@ public static class ShelfStock
         return false;
     }
 
-    public static bool TryTakeAny(string sceneName, out string itemName)
+    public static bool TryTakeAny(string sceneName, out ItemData item)
     {
-        itemName = null;
+        item = null;
         string prefix = sceneName + "/";
         for (int i = 0; i < records.Count; i++)
         {
@@ -286,8 +309,7 @@ public static class ShelfStock
                 if (record.items[s] == null || record.amounts[s] <= 0)
                     continue;
 
-                ItemData item = record.items[s];
-                itemName = string.IsNullOrEmpty(item.itemName) ? item.itemId : item.itemName;
+                item = record.items[s];
                 record.amounts[s]--;
                 if (record.amounts[s] <= 0)
                 {
@@ -321,5 +343,90 @@ public static class ShelfStock
     static string Key(string sceneName, string shelfName)
     {
         return sceneName + "/" + shelfName;
+    }
+
+    public static void Clear()
+    {
+        records.Clear();
+        Epoch++;
+    }
+
+    public static void Invalidate()
+    {
+        Epoch++;
+    }
+
+    public static SavedShelf[] Export()
+    {
+        SavedShelf[] saved = new SavedShelf[records.Count];
+        for (int i = 0; i < records.Count; i++)
+        {
+            Record record = records[i];
+            int count = record.amounts != null ? record.amounts.Length : 0;
+            SavedSlot[] slots = new SavedSlot[count];
+            for (int s = 0; s < count; s++)
+            {
+                ItemData item = record.items != null && s < record.items.Length ? record.items[s] : null;
+                int amount = record.amounts[s];
+                if (item == null || amount <= 0)
+                {
+                    slots[s] = new SavedSlot();
+                    continue;
+                }
+
+                slots[s] = new SavedSlot
+                {
+                    itemId = InventoryManager.ItemKey(item),
+                    amount = amount
+                };
+            }
+
+            saved[i] = new SavedShelf
+            {
+                key = record.key,
+                slots = slots
+            };
+        }
+
+        return saved;
+    }
+
+    public static void Import(SavedShelf[] saved, Func<string, ItemData> resolve)
+    {
+        records.Clear();
+        if (saved == null)
+            return;
+
+        for (int i = 0; i < saved.Length; i++)
+        {
+            SavedShelf shelf = saved[i];
+            if (shelf == null || string.IsNullOrEmpty(shelf.key))
+                continue;
+
+            SavedSlot[] slots = shelf.slots;
+            int count = slots != null ? slots.Length : 0;
+            Record record = new Record
+            {
+                key = shelf.key,
+                items = new ItemData[count],
+                amounts = new int[count]
+            };
+
+            for (int s = 0; s < count; s++)
+            {
+                SavedSlot slot = slots[s];
+                if (slot == null || slot.amount <= 0 || string.IsNullOrEmpty(slot.itemId))
+                    continue;
+
+                ItemData item = resolve != null ? resolve(slot.itemId) : null;
+                if (item == null)
+                    continue;
+
+                record.items[s] = item;
+                record.amounts[s] = slot.amount;
+            }
+
+            records.Add(record);
+        }
     }
 }

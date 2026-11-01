@@ -10,8 +10,6 @@ public class NPCManager : MonoBehaviour
     readonly List<NPCActor> actors = new List<NPCActor>();
     bool spawnDemoIfMissing = true;
     bool built;
-    float clockHour = 8f;
-    float realSecondsPerGameHour = 20f;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     static void Bootstrap()
@@ -51,9 +49,7 @@ public class NPCManager : MonoBehaviour
         if (!built)
             BuildActors();
 
-        if (clockHour < 24f)
-            clockHour = Mathf.Min(24f, clockHour + Time.deltaTime / Mathf.Max(1f, realSecondsPerGameHour));
-
+        LifeTime.Ensure();
         Evaluate();
         SimulateHidden(Time.deltaTime);
         RefreshPresence(SceneManager.GetActiveScene());
@@ -70,10 +66,10 @@ public class NPCManager : MonoBehaviour
 
     public static void ReportHour(float hour)
     {
+        LifeTime.SetHour(hour);
         if (Instance == null)
             Bootstrap();
 
-        Instance.clockHour = Mathf.Clamp(hour, 0f, 24f);
         Instance.Evaluate();
     }
 
@@ -101,11 +97,63 @@ public class NPCManager : MonoBehaviour
         if (actor == null || actor.completing || actor.presence != NPCPresence.Active)
             return;
 
-        actor.actionIndex++;
-        while (actor.actionIndex < actor.ActionCount && actor.Action == "mua" && !actor.wantsItem)
-            actor.actionIndex++;
+        if (actor.fillingTime)
+        {
+            if (actor.Entry != null && actor.Entry.MustLeaveNow())
+            {
+                if (Instance != null)
+                    Instance.RequestLeave(actor);
+                return;
+            }
 
-        if (actor.actionIndex >= actor.ActionCount)
+            if (ShouldFill(actor))
+            {
+                actor.PickFillAction();
+                actor.BeginAction();
+                if (actor.body != null)
+                    actor.body.Traveler.RefreshAction(false);
+                return;
+            }
+
+            actor.fillingTime = false;
+            CompleteVisit(actor);
+            return;
+        }
+
+        actor.actionIndex++;
+        bool skippedPurchase = false;
+        while (actor.actionIndex < actor.ActionCount && SkipWithoutGoods(actor))
+        {
+            skippedPurchase = true;
+            actor.actionIndex++;
+        }
+
+        if (skippedPurchase)
+            Debug.Log("NPC " + actor.id + " khong mua, chi xem.");
+
+        bool scriptDone = actor.actionIndex >= actor.ActionCount;
+        bool exitStep = !scriptDone && actor.Action == "ra";
+        if (scriptDone || exitStep)
+        {
+            if (ShouldFill(actor))
+            {
+                actor.BeginFill();
+                if (actor.body != null)
+                    actor.body.Traveler.RefreshAction(false);
+                return;
+            }
+
+            if (scriptDone && actor.Entry != null && actor.Entry.LeaveHour >= 0f)
+            {
+                if (Instance != null)
+                    Instance.RequestLeave(actor);
+                else
+                    CompleteVisit(actor);
+                return;
+            }
+        }
+
+        if (scriptDone)
         {
             CompleteVisit(actor);
             return;
@@ -121,7 +169,17 @@ public class NPCManager : MonoBehaviour
         if (Instance == null || actor == null || actor.completing || actor.presence == NPCPresence.Done)
             return;
 
+        if (ShouldFill(actor))
+        {
+            actor.BeginFill();
+            if (actor.body != null)
+                actor.body.Traveler.RefreshAction(false);
+            return;
+        }
+
         actor.completing = true;
+        if (actor.body != null)
+            actor.body.Traveler.ReleaseCheckoutItem();
         Instance.Despawn(actor);
         actor.visitIndex++;
         Instance.SkipExpired(actor);
@@ -176,11 +234,7 @@ public class NPCManager : MonoBehaviour
     {
         actors.Clear();
         NPCScheduleTable[] tables = NPCScheduleTable.LoadAll();
-        if (tables.Length > 0)
-        {
-            clockHour = tables[0].DayStartHour;
-            realSecondsPerGameHour = tables[0].RealSecondsPerGameHour;
-        }
+        LifeTime.Ensure();
 
         for (int t = 0; t < tables.Length; t++)
         {
@@ -247,9 +301,7 @@ public class NPCManager : MonoBehaviour
     {
         actor.ResetVisit();
         actor.presence = NPCPresence.Active;
-        int hour = Mathf.FloorToInt(clockHour);
-        int minute = Mathf.FloorToInt((clockHour - hour) * 60f);
-        Debug.Log("NPC " + actor.id + " xuat hien luc " + hour.ToString("00") + ":" + minute.ToString("00")
+        Debug.Log("NPC " + actor.id + " xuat hien luc " + LifeTime.FormatHour(LifeTime.HourNow)
             + " tai " + actor.Entry.mapName + ".");
         TrySpawn(actor, SceneManager.GetActiveScene());
     }
@@ -265,17 +317,21 @@ public class NPCManager : MonoBehaviour
 
     bool CanStart(NPCScheduleEntry entry)
     {
-        float appear = entry.AppearHour;
-        if (appear < 0f)
-            return true;
-
-        return clockHour + 0.001f >= appear;
+        return entry.CanAppearNow();
     }
 
     bool VisitExpired(NPCScheduleEntry entry)
     {
-        float leave = entry.LeaveHour;
-        return leave >= 0f && clockHour >= leave;
+        return entry.MustLeaveNow();
+    }
+
+    static bool ShouldFill(NPCActor actor)
+    {
+        if (actor == null || actor.leaveRequested || actor.forcedLeave)
+            return false;
+
+        NPCScheduleEntry entry = actor.Entry;
+        return entry != null && entry.LeaveHour >= 0f && !entry.MustLeaveNow();
     }
 
     void RequestLeave(NPCActor actor)
@@ -283,20 +339,27 @@ public class NPCManager : MonoBehaviour
         if (actor.leaveRequested || actor.presence != NPCPresence.Active)
             return;
 
+        bool wasFilling = actor.fillingTime;
         actor.leaveRequested = true;
+        actor.fillingTime = false;
+        actor.fillAction = null;
+        actor.forcedLeave = false;
+
         int ra = actor.FindAction("ra");
-        if (ra < 0)
+        if (ra >= 0)
         {
-            CompleteVisit(actor);
+            if (!wasFilling && actor.actionIndex == ra)
+                return;
+
+            actor.actionIndex = ra;
+            actor.BeginAction();
+            if (actor.body != null)
+                actor.body.Traveler.RefreshAction(false);
             return;
         }
 
-        if (actor.Action == "ra")
-            return;
-
-        actor.actionIndex = ra;
+        actor.forcedLeave = true;
         actor.BeginAction();
-        actor.leaveRequested = true;
         if (actor.body != null)
             actor.body.Traveler.RefreshAction(false);
     }
@@ -323,6 +386,15 @@ public class NPCManager : MonoBehaviour
 
     void StepHidden(NPCActor actor, float dt)
     {
+        if (actor.fillingTime && (actor.Action == "di" || actor.Action == "xem"))
+        {
+            float need = actor.fillDuration > 0f ? actor.fillDuration : NPCTiming.PointSeconds;
+            actor.timer += dt;
+            if (actor.timer >= need)
+                AdvanceAction(actor);
+            return;
+        }
+
         if (actor.reachedEnd && (actor.Action == "di" || actor.Action == "xem"))
         {
             AdvanceAction(actor);
@@ -353,21 +425,62 @@ public class NPCManager : MonoBehaviour
                 break;
             case "chon":
                 actor.timer += dt;
-                if (actor.timer < NPCTiming.ChooseSeconds)
+                if (actor.timer < ActionSeconds(actor, NPCTiming.ChooseSeconds))
                     return;
 
                 actor.looked = true;
-                actor.wantsItem = ShelfStock.HasStock(actor.Entry.mapName);
+                if (!actor.fillingTime)
+                    actor.wantsItem = ShelfStock.HasStock(actor.Entry.mapName);
                 AdvanceAction(actor);
                 break;
             case "mua":
-                if (!actor.purchaseDone)
+                if (actor.heldItem == null)
                 {
-                    actor.purchaseDone = true;
-                    if (ShelfStock.TryTakeAny(actor.Entry.mapName, out string itemName))
-                        Debug.Log("NPC " + actor.id + " mua " + itemName + ".");
+                    if (actor.wantsItem && ShelfStock.TryTakeAny(actor.Entry.mapName, out ItemData item))
+                        actor.heldItem = item;
                     else
                         actor.wantsItem = false;
+                }
+
+                if (actor.heldItem == null)
+                {
+                    AdvanceAction(actor);
+                    return;
+                }
+
+                actor.timer += dt;
+                if (actor.timer >= NPCTiming.BuySeconds)
+                    AdvanceAction(actor);
+                break;
+            case "doi":
+                if (actor.heldItem == null || actor.paid)
+                {
+                    AdvanceAction(actor);
+                    return;
+                }
+
+                if (!actor.itemPlaced)
+                {
+                    actor.timer += dt;
+                    if (actor.timer < NPCTiming.PointSeconds)
+                        return;
+
+                    actor.itemPlaced = true;
+                    actor.timer = 0f;
+                    return;
+                }
+
+                actor.timer += dt;
+                if (actor.timer >= NPCTiming.PayWaitSeconds)
+                    AdvanceAction(actor);
+                break;
+            case "tra":
+                if (!actor.paid)
+                {
+                    actor.paid = true;
+                    int coins = PlayerCoin.Earn(actor.heldItem);
+                    string label = actor.heldItem != null ? actor.heldItem.Label : "mon";
+                    Debug.Log("NPC " + actor.id + " thanh toan " + label + " (+" + coins + " coin).");
                 }
 
                 actor.timer += dt;
@@ -376,7 +489,7 @@ public class NPCManager : MonoBehaviour
                 break;
             case "dung":
                 actor.timer += dt;
-                if (actor.timer >= NPCTiming.StandSeconds)
+                if (actor.timer >= ActionSeconds(actor, NPCTiming.StandSeconds))
                     AdvanceAction(actor);
                 break;
             case "ra":
@@ -440,9 +553,16 @@ public class NPCManager : MonoBehaviour
             return true;
         }
 
+        if (actor.fillingTime && TryRandomPoint(entry.WalkPointNames, out position))
+            return true;
+
         string[] points = entry.WalkPointNames;
         string action = actor.Action;
-        if ((action == "chon" || action == "mua" || action == "dung" || actor.reachedEnd) && points.Length > 0)
+        if ((action == "tra" || (action == "doi" && actor.itemPlaced))
+            && TryFind(CheckoutTable.CounterPointName, out position))
+            return true;
+
+        if ((action == "chon" || action == "mua" || action == "doi" || action == "dung" || actor.reachedEnd) && points.Length > 0)
         {
             if (TryFind(points[points.Length - 1], out position))
                 return true;
@@ -459,6 +579,38 @@ public class NPCManager : MonoBehaviour
             return true;
 
         return TryFind(entry.spawnPointName, out position);
+    }
+
+    static float ActionSeconds(NPCActor actor, float scripted)
+    {
+        if (actor.fillingTime && actor.fillDuration > 0f)
+            return actor.fillDuration;
+
+        return scripted;
+    }
+
+    static bool SkipWithoutGoods(NPCActor actor)
+    {
+        if (actor == null || !NPCScheduleTime.IsPurchaseAction(actor.Action))
+            return false;
+
+        return actor.heldItem == null && !actor.wantsItem;
+    }
+
+    static bool TryRandomPoint(string[] names, out Vector3 position)
+    {
+        position = default;
+        if (names == null || names.Length == 0)
+            return false;
+
+        int start = Random.Range(0, names.Length);
+        for (int n = 0; n < names.Length; n++)
+        {
+            if (TryFind(names[(start + n) % names.Length], out position))
+                return true;
+        }
+
+        return false;
     }
 
     static bool TryFind(string objectName, out Vector3 position)

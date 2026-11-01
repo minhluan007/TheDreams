@@ -166,6 +166,11 @@ public class NPCMove : MonoBehaviour
             rb.linearVelocity = Vector2.zero;
     }
 
+    public void ReleaseHold()
+    {
+        holdUntil = 0f;
+    }
+
     public void FaceTowards(Vector2 world)
     {
         float dx = world.x - transform.position.x;
@@ -248,6 +253,12 @@ public class NPCMove : MonoBehaviour
         {
             overrideTarget = null;
             HasReachedEnd = true;
+            if (dwellOnArrival > 0f)
+            {
+                Hold(dwellOnArrival);
+                dwellOnArrival = 0f;
+            }
+
             return;
         }
 

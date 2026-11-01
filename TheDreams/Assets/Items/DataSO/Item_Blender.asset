@@ -16,3 +16,4 @@ MonoBehaviour:
   itemName: Machinery Blender
   icon: {fileID: 8897671697525770861, guid: 4dffbf2c34d864740ba4af2ebddc9aec, type: 3}
   maxStack: 20
+  coinPrice: 180

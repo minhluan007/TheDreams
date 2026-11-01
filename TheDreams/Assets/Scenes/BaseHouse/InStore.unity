@@ -831,6 +831,37 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 244e3b6e9b2ff9942b69ce1c8c29b9d5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ShelfSlotItem
+--- !u!1 &422146030
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 422146031}
+  m_Layer: 0
+  m_Name: WP_CheckoutCounter
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &422146031
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 422146030}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 3.04, y: -6.5, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 880021011}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &497156973
 GameObject:
   m_ObjectHideFlags: 0
@@ -960,6 +991,37 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3628627780217975336, guid: f0ed77d7b1d2af34bbd35239688fb229, type: 3}
   m_PrefabInstance: {fileID: 1797201982}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &830621449
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 830621450}
+  m_Layer: 0
+  m_Name: Table_Checkout
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &830621450
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 830621449}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 3.37, y: -0.59, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1678942678}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!224 &839297571 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 679861229472454183, guid: 3301955662848cf4d91f44911cffff9c, type: 3}
@@ -1013,12 +1075,14 @@ MonoBehaviour:
   hierarchyNotes: 'HIERARCHY NPC InStore
 
     NPC vao cua sau khi xong chang duong.
-    Trong shop: xem, chon, mua, dung, ra Exit_ToStreet.
+    Trong shop: xem, chon, mua, doi, tra, dung, ra Exit_ToStreet.
+    mua lay do o ke. doi toi WP_CheckoutCounter, dat len Table_Checkout, dung 3 giay. tra moi cong coin.
 
-    Doi map roi quay lai: NPC dung tiep cho cu,
-    khong spawn lai tu cua.
+    Doi map roi quay lai:
+    NPC dung tiep cho cu, khong spawn lai tu cua.
 
-    Ke co hang thi mua 1 mon. Ke trong thi xem roi di.'
+    Ke co hang va co mua/doi/tra thi khach mua 1 mon.
+    Khong chon duoc mon, hoac lich chi xem, thi khach xem roi ve.'
 --- !u!1 &880021010
 GameObject:
   m_ObjectHideFlags: 0
@@ -1051,6 +1115,7 @@ Transform:
   m_Children:
   - {fileID: 880021021}
   - {fileID: 880021031}
+  - {fileID: 422146031}
   m_Father: {fileID: 880021002}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &880021012
@@ -1473,6 +1538,38 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SortY
   offset: -2
   multiplier: -2
+--- !u!1 &1678942677
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1678942678}
+  m_Layer: 0
+  m_Name: Table
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1678942678
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1678942677}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 830621450}
+  m_Father: {fileID: 1921261360}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1797201982
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1654,6 +1751,7 @@ Transform:
   m_Children:
   - {fileID: 131837783}
   - {fileID: 1471559002}
+  - {fileID: 1678942678}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1930169409

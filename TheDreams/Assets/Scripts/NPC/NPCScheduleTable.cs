@@ -1,3 +1,28 @@
+// Cot "hanh vi": nhieu action, cach nhau dau phay. De trong thi mac dinh: di, ra.
+// Moi action nhap dung tu khoa, hoac nhap like (bat dau bang tu khoa).
+// Khong phan biet hoa thuong. Dau _ duoc doi thanh dau cach truoc khi so.
+// Vi du like: "xem hang" = xem, "mua do" = mua, "thanh toan" = tra, "roi di" = ra.
+// mua / doi / tra bi bo qua neu khong chon duoc mon, hoac ke khong con hang.
+//
+// di    Di lan luot cac diem o cot "di", khong dung lai. Het diem thi sang action sau.
+//       Dung: di. Like: "di ..." (phai co dau cach) hoac bat dau bang "đi". Vi du: di dao, đi dạo.
+//       "dia" khong tinh la di, vi thieu dau cach sau "di".
+// xem   Cung lo trinh voi di, nhung dung khoang 1.5s o moi diem de xem.
+//       Dung: xem. Like: bat dau bang "xem". Vi du: xem hang, xem ke.
+// chon  Dung truoc ke, chon 1 mon neu ke con hang. Chua lay mon, chua cong coin. Dung khoang 2s.
+//       Dung: chon. Like: bat dau bang "chon" hoac "chọn". Vi du: chon mon, chọn hàng.
+// mua   Toi ke, lay mon da chon khoi ke. Chua cong coin. Dung khoang 1.1s. Khong co mon thi bo qua.
+//       Dung: mua. Like: bat dau bang "mua". Vi du: mua hang, mua do.
+// doi   Toi quay thanh toan, dat mon len ban, dung doi khoang 3s. Khong cam mon thi bo qua.
+//       Dung: doi. Like: bat dau bang "doi" hoac "đợi". Vi du: doi tra, đợi tính tiền.
+// tra   Thanh toan va cong coin. Dung khoang 1.1s. Sang action khac thi lay mon khoi Table_Checkout.
+//       Dung: tra. Like: bat dau bang "tra", "trả", hoac "thanh". Vi du: tra tien, trả tiền, thanh toan.
+// dung  Dung yen tai cho khoang 1.4s.
+//       Dung: dung. Like: bat dau bang "dung" hoac "đứng". Vi du: dung lai, đứng im.
+// ra    Di toi diem destroy roi bien mat, ket thuc luot.
+//       Dung: ra. Like: "ra ..." (phai co dau cach), hoac bat dau bang "roi" / "rời".
+//       Vi du: ra cua, roi di, rời đi. "ranh" khong tinh la ra.
+//
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -15,20 +40,9 @@ public class NPCScheduleTable : ScriptableObject
     public const string ResourcePath = "NPCSchedule";
     public const string AssetPath = "Assets/NPC/DataSO/Resources/NPCSchedule.asset";
 
-    [Tooltip("Gio luc vao game (0-24). NPC chi xuat hien khi dong ho toi cot xuat hien.")]
-    [SerializeField] float dayStartHour = 8.75f;
-
-    [Tooltip("Giay that cho 1 gio trong game. 20 = tu 8:00 toi 9:00 mat 20 giay.")]
-    [SerializeField] float realSecondsPerGameHour = 20f;
-
     [TextArea(8, 20)]
-    [Tooltip("Moi dong 1 chang cua NPC. Cung id, nhieu dong = mot ngay, dung thu tu.\nCot cach nhau bang |. Dong bat dau bang # bi bo qua.\n\nid | prefab | map | spawn | di | destroy | xuat hien | roi di | hanh vi\n\nHanh vi: di, xem, chon, mua, dung, ra. Cach nhau dau phay.\nDiem di cach nhau dau phay. Gio de trong hoac - neu di tiep ngay.\nSau khi sua text, bam Nap text vao bang.")]
+    [Tooltip("Moi dong 1 chang cua NPC. Cung id, nhieu dong = mot ngay, dung thu tu.\nCot cach nhau bang |. Dong bat dau bang # bi bo qua.\n\nid | prefab | map | spawn | di | destroy | xuat hien | roi di | hanh vi\n\nHanh vi: di, xem, chon, mua, doi, tra, dung, ra. Cach nhau dau phay.\nmua: lay mon o ke, chua cong coin. doi: toi WP_CheckoutCounter, dat mon len Table_Checkout, dung 3 giay. tra: thanh toan, cong coin. Sang action khac thi lay mon khoi ban.\nKhong co mua/doi/tra, hoac khong chon duoc mon, thi khach chi xem roi ve.\nDiem di cach nhau dau phay. Gio de trong hoac - neu di tiep ngay.\nNeu co gio roi di, xong hanh vi ma chua toi gio thi NPC di dao walkPoint ngau nhien, xen xem / dung / chon, toi gio moi ra cua.\nSau khi sua text, bam Nap text vao bang.")]
     [SerializeField] string sheet;
-
-    public float DayStartHour => Mathf.Clamp(dayStartHour, 0f, 24f);
-
-    public float RealSecondsPerGameHour =>
-        realSecondsPerGameHour <= 0.01f ? 20f : realSecondsPerGameHour;
 
     [SerializeField] NPCScheduleEntry[] entries = Array.Empty<NPCScheduleEntry>();
 
@@ -219,10 +233,10 @@ public class NPCScheduleEntry
     [Tooltip("Gio xuat hien. 8, 8:30, hoac de trong / - neu chua co dong ho.")]
     public string appearTime = "";
 
-    [Tooltip("Gio roi map. De trong / - thi xong hanh vi moi di. Toi gio nay thi cat ngang, ra cua.")]
+    [Tooltip("Gio roi map. De trong / - thi xong hanh vi moi ra cua. Con gio thi di dao, xem, dung, chon cho den gio do moi ra.")]
     public string leaveTime = "";
 
-    [Tooltip("di, xem, chon, mua, dung, ra. Trong thi mac dinh di, ra.")]
+    [Tooltip("di, xem, chon, mua, doi, tra, dung, ra. Trong thi mac dinh di, ra. mua lay do. doi cho thanh toan. tra cong coin, sang action khac thi lay mon khoi ban. Bo qua mua/doi/tra neu khong chon mon.")]
     public string actions = "";
 
     public float AppearHour => NPCScheduleTime.ParseHour(appearTime);
@@ -253,17 +267,30 @@ public class NPCScheduleEntry
             && string.Equals(mapName.Trim(), sceneName, StringComparison.Ordinal);
     }
 
-    public bool IsInsideWindow(float? hour)
+    public bool CanAppearNow()
     {
-        if (!hour.HasValue)
+        float appear = AppearHour;
+        if (appear < 0f)
             return true;
 
+        return LifeTime.HourNow + 0.001f >= appear;
+    }
+
+    public bool MustLeaveNow()
+    {
+        float leave = LeaveHour;
+        return leave >= 0f && LifeTime.HourNow >= leave;
+    }
+
+    public bool IsInsideWindow(float? hour)
+    {
+        float value = hour ?? LifeTime.HourNow;
         float appear = AppearHour;
         float leave = LeaveHour;
-        if (appear >= 0f && hour.Value < appear)
+        if (appear >= 0f && value < appear)
             return false;
 
-        if (leave >= 0f && hour.Value >= leave)
+        if (leave >= 0f && value >= leave)
             return false;
 
         return true;
@@ -341,6 +368,10 @@ public static class NPCScheduleTime
             return "chon";
         if (value.StartsWith("mua"))
             return "mua";
+        if (value.StartsWith("doi") || value.StartsWith("đợi"))
+            return "doi";
+        if (value.StartsWith("tra") || value.StartsWith("trả") || value.StartsWith("thanh"))
+            return "tra";
         if (value.StartsWith("xem"))
             return "xem";
         if (value.StartsWith("dung") || value.StartsWith("đứng"))
@@ -351,6 +382,11 @@ public static class NPCScheduleTime
             return "di";
 
         return value;
+    }
+
+    public static bool IsPurchaseAction(string action)
+    {
+        return action == "mua" || action == "doi" || action == "tra";
     }
 
     static float ClampHour(float hour)
@@ -366,8 +402,65 @@ public static class NPCScheduleTime
 [CustomEditor(typeof(NPCScheduleTable))]
 public class NPCScheduleTableEditor : Editor
 {
+    static bool showActionNotes = true;
+    static GUIStyle noteBody;
+
+    static readonly string[][] ActionNotes =
+    {
+        new[]
+        {
+            "di",
+            "Di lan luot cac diem o cot \"di\", khong dung lai. Het diem thi sang action sau.",
+            "Dung: di. Like: \"di ...\" (phai co dau cach) hoac bat dau bang \"đi\". Vi du: di dao, đi dạo. \"dia\" khong tinh."
+        },
+        new[]
+        {
+            "xem",
+            "Cung lo trinh voi di, nhung dung khoang 1.5s o moi diem de xem.",
+            "Dung: xem. Like: bat dau bang \"xem\". Vi du: xem hang, xem ke."
+        },
+        new[]
+        {
+            "chon",
+            "Dung truoc ke, chon 1 mon neu ke con hang. Chua lay mon, chua cong coin. Dung khoang 2s.",
+            "Dung: chon. Like: bat dau bang \"chon\" hoac \"chọn\". Vi du: chon mon, chọn hàng."
+        },
+        new[]
+        {
+            "mua",
+            "Toi ke, lay mon da chon khoi ke. Chua cong coin. Dung khoang 1.1s. Khong co mon thi bo qua.",
+            "Dung: mua. Like: bat dau bang \"mua\". Vi du: mua hang, mua do."
+        },
+        new[]
+        {
+            "doi",
+            "Toi quay thanh toan, dat mon len ban, dung doi khoang 3s. Khong cam mon thi bo qua.",
+            "Dung: doi. Like: bat dau bang \"doi\" hoac \"đợi\". Vi du: doi tra, đợi tính tiền."
+        },
+        new[]
+        {
+            "tra",
+            "Thanh toan va cong coin. Dung khoang 1.1s. Sang action khac thi lay mon khoi Table_Checkout.",
+            "Dung: tra. Like: bat dau bang \"tra\", \"trả\", hoac \"thanh\". Vi du: tra tien, trả tiền, thanh toan."
+        },
+        new[]
+        {
+            "dung",
+            "Dung yen tai cho khoang 1.4s.",
+            "Dung: dung. Like: bat dau bang \"dung\" hoac \"đứng\". Vi du: dung lai, đứng im."
+        },
+        new[]
+        {
+            "ra",
+            "Di toi diem destroy roi bien mat, ket thuc luot.",
+            "Dung: ra. Like: \"ra ...\" (phai co dau cach), hoac bat dau bang \"roi\" / \"rời\". Vi du: ra cua, roi di, rời đi. \"ranh\" khong tinh."
+        }
+    };
+
     public override void OnInspectorGUI()
     {
+        DrawActionNotes();
+        EditorGUILayout.Space();
         DrawDefaultInspector();
 
         EditorGUILayout.Space();
@@ -385,6 +478,40 @@ public class NPCScheduleTableEditor : Editor
             Undo.RecordObject(table, "Xuat NPC schedule");
             table.CopyEntriesToSheet();
             EditorUtility.SetDirty(table);
+        }
+    }
+
+    static void DrawActionNotes()
+    {
+        showActionNotes = EditorGUILayout.Foldout(showActionNotes, "Ghi chu hanh vi", true);
+        if (!showActionNotes)
+            return;
+
+        if (noteBody == null)
+        {
+            noteBody = new GUIStyle(EditorStyles.wordWrappedLabel)
+            {
+                fontSize = 11,
+                richText = true
+            };
+        }
+
+        EditorGUILayout.HelpBox(
+            "Cot hanh vi: nhieu action, cach nhau dau phay. De trong = di, ra.\n" +
+            "Nhap dung tu khoa, hoac nhap like (bat dau bang tu khoa).\n" +
+            "Khong phan biet hoa thuong. Dau _ doi thanh dau cach.\n" +
+            "Vi du like: \"xem hang\" = xem, \"mua do\" = mua, \"thanh toan\" = tra, \"roi di\" = ra.\n" +
+            "mua / doi / tra bi bo qua neu khong chon duoc mon, hoac ke khong con hang.",
+            MessageType.Info);
+
+        for (int i = 0; i < ActionNotes.Length; i++)
+        {
+            string[] note = ActionNotes[i];
+            EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+            EditorGUILayout.LabelField(note[0], EditorStyles.boldLabel);
+            EditorGUILayout.LabelField(note[1], noteBody);
+            EditorGUILayout.LabelField(note[2], noteBody);
+            EditorGUILayout.EndVertical();
         }
     }
 }
