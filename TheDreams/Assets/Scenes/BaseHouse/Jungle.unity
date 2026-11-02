@@ -589,166 +589,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: df0da4ab42a538d489e0acb386181b53, type: 3}
---- !u!1 &2085732887
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2085732889}
-  - component: {fileID: 2085732888}
-  - component: {fileID: 2085732891}
-  - component: {fileID: 2085732890}
-  m_Layer: 0
-  m_Name: ------ ShopJungle ------
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!61 &2085732888
-BoxCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2085732887}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ForceSendLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ForceReceiveLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ContactCaptureLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_CallbackLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_CompositeOperation: 0
-  m_CompositeOrder: 0
-  m_Offset: {x: 0.20155096, y: 0.04243183}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0, y: 0}
-    oldSize: {x: 0, y: 0}
-    newSize: {x: 0, y: 0}
-    adaptiveTilingThreshold: 0
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  m_Size: {x: 1.4031019, y: 3.3761806}
-  m_EdgeRadius: 0
---- !u!4 &2085732889
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2085732887}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2.68, y: -24.6, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!61 &2085732891
-BoxCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2085732887}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ForceSendLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ForceReceiveLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ContactCaptureLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_CallbackLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_IsTrigger: 1
-  m_UsedByEffector: 0
-  m_CompositeOperation: 0
-  m_CompositeOrder: 0
-  m_Offset: {x: 0.20155096, y: 0.04243183}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0, y: 0}
-    oldSize: {x: 0, y: 0}
-    newSize: {x: 0, y: 0}
-    adaptiveTilingThreshold: 0
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  m_Size: {x: 2.6, y: 4.6}
-  m_EdgeRadius: 0
---- !u!114 &2085732890
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2085732887}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b7e4c1a92f6d4c8e9a0b3d5f17c842e6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Shop
-  shopTitle: "Cửa hàng"
-  offers:
-  - item: {fileID: 11400000, guid: 0f42357958b83874293a023eb0cbaa68, type: 2}
-    overridePrice: 1
-    coinPrice: 15
-    description: "Khoai tây tươi.\nDùng để nấu ăn."
-  - item: {fileID: 11400000, guid: 54531358980005e41b882b277f458e33, type: 2}
-    overridePrice: 1
-    coinPrice: 40
-    description: "Mũ vải nhẹ.\nĐội khi ra ngoài."
-  - item: {fileID: 11400000, guid: 378a5cd70458a0141b8c493b66500bcc, type: 2}
-    overridePrice: 1
-    coinPrice: 60
-    description: "Mũ dày hơn.\nGiữ ấm khi trời lạnh."
-  - item: {fileID: 11400000, guid: 4ead9881f5453af42ae2dc60d796f83e, type: 2}
-    overridePrice: 1
-    coinPrice: 90
-    description: "Gấu bông panda.\nĐặt lên kệ để bán."
-  - item: {fileID: 11400000, guid: 5ecd8e82582f7b94da392ad29187b539, type: 2}
-    overridePrice: 1
-    coinPrice: 180
-    description: "Máy xay nhỏ.\nDùng trong bếp."
 --- !u!1 &228528535039914239
 GameObject:
   m_ObjectHideFlags: 0
@@ -849,6 +689,63 @@ MonoBehaviour:
   maxZoom: 16
   zoomSpeed: 8
   zoomSmoothTime: 0.12
+--- !u!1001 &3630396314694690060
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 3401345023460620904, guid: 49fbb95a3335b8943917ddce829233fc, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 2.68
+      objectReference: {fileID: 0}
+    - target: {fileID: 3401345023460620904, guid: 49fbb95a3335b8943917ddce829233fc, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -24.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 3401345023460620904, guid: 49fbb95a3335b8943917ddce829233fc, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3401345023460620904, guid: 49fbb95a3335b8943917ddce829233fc, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3401345023460620904, guid: 49fbb95a3335b8943917ddce829233fc, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3401345023460620904, guid: 49fbb95a3335b8943917ddce829233fc, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3401345023460620904, guid: 49fbb95a3335b8943917ddce829233fc, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3401345023460620904, guid: 49fbb95a3335b8943917ddce829233fc, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3401345023460620904, guid: 49fbb95a3335b8943917ddce829233fc, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3401345023460620904, guid: 49fbb95a3335b8943917ddce829233fc, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5979987422299558252, guid: 49fbb95a3335b8943917ddce829233fc, type: 3}
+      propertyPath: m_Name
+      value: ------ ShopJungle ------
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 49fbb95a3335b8943917ddce829233fc, type: 3}
 --- !u!81 &6031786180562703520
 AudioListener:
   m_ObjectHideFlags: 0
@@ -919,4 +816,4 @@ SceneRoots:
   - {fileID: 2010055586}
   - {fileID: 1364543858}
   - {fileID: 249027489}
-  - {fileID: 2085732889}
+  - {fileID: 3630396314694690060}
