@@ -1,4 +1,3 @@
-
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -15,53 +14,62 @@ public static class InventoryTransfer
         if (sourceIndex < 0 || sourceIndex >= source.Count)
             return false;
 
-        var from = source[sourceIndex];
-
-        if (from == null || from.item == null || from.amount <= 0)
+        InventorySlotData from = source[sourceIndex];
+        if (from == null || !from.HasItem)
             return false;
 
         ItemData item = from.item;
         const int amountToMove = 1;
         int maxStack = Mathf.Max(1, item.maxStack);
 
-        foreach (var slot in destination)
+        for (int i = 0; i < destination.Count; i++)
         {
-            if (slot == null || slot.item != item)
-                continue;
-
-            if (slot.amount >= maxStack)
+            InventorySlotData slot = destination[i];
+            if (slot == null || slot.item != item || slot.amount <= 0 || slot.amount >= maxStack)
                 continue;
 
             slot.amount += amountToMove;
-            from.amount -= amountToMove;
-
-            if (from.amount <= 0)
-            {
-                from.item = null;
-                from.amount = 0;
-            }
-
+            CopySellPrice(from, slot);
+            Consume(from, amountToMove);
             return true;
         }
 
-        foreach (var slot in destination)
+        for (int i = 0; i < destination.Count; i++)
         {
-            if (slot == null || slot.item != null)
+            InventorySlotData slot = destination[i];
+            if (slot == null || slot.HasItem)
                 continue;
 
             slot.item = item;
             slot.amount = amountToMove;
-            from.amount -= amountToMove;
-
-            if (from.amount <= 0)
+            if (from.sellPriceSet)
+                CopySellPrice(from, slot);
+            else
             {
-                from.item = null;
-                from.amount = 0;
+                slot.coinPriceSell = 0;
+                slot.sellPriceSet = false;
             }
 
+            Consume(from, amountToMove);
             return true;
         }
 
         return false;
+    }
+
+    static void CopySellPrice(InventorySlotData from, InventorySlotData slot)
+    {
+        if (!from.sellPriceSet)
+            return;
+
+        slot.coinPriceSell = from.coinPriceSell;
+        slot.sellPriceSet = true;
+    }
+
+    static void Consume(InventorySlotData from, int amount)
+    {
+        from.amount -= amount;
+        if (from.amount <= 0)
+            from.Clear();
     }
 }

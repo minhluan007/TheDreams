@@ -570,6 +570,12 @@ RectTransform:
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 4313266148652394145}
+  - {fileID: 1794575921884942085}
+  - {fileID: 534924836106794173}
+  - {fileID: 169404078234709566}
+  - {fileID: 7933446950003326196}
+  - {fileID: 6414860588350076323}
   - {fileID: 3602038024539991382}
   - {fileID: 2334893697039218369}
   - {fileID: 4217541719081052688}
@@ -577,12 +583,6 @@ RectTransform:
   - {fileID: 3887667000193840916}
   - {fileID: 9134667810077282498}
   - {fileID: 3928056164877124482}
-  - {fileID: 4313266148652394145}
-  - {fileID: 1794575921884942085}
-  - {fileID: 534924836106794173}
-  - {fileID: 169404078234709566}
-  - {fileID: 7933446950003326196}
-  - {fileID: 6414860588350076323}
   - {fileID: 7208420312102074627}
   - {fileID: 2492491587649365993}
   m_Father: {fileID: 3683338641350241123}
@@ -1566,14 +1566,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.GridLayoutGroup
   m_Padding:
-    m_Left: 0
-    m_Right: 0
-    m_Top: 0
-    m_Bottom: 0
+    m_Left: 4
+    m_Right: 4
+    m_Top: 4
+    m_Bottom: 4
   m_ChildAlignment: 0
   m_StartCorner: 0
   m_StartAxis: 0
-  m_CellSize: {x: 48, y: 48}
+  m_CellSize: {x: 16, y: 16}
   m_Spacing: {x: 4, y: 4}
   m_Constraint: 0
   m_ConstraintCount: 2
@@ -1626,46 +1626,78 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InventoryManager
   slots:
+  - item: {fileID: 11400000, guid: e40b859bcb88029478bab255ccdc4eca, type: 2}
+    amount: 10
+    coinPriceSell: 20
+    sellPriceSet: 0
+  - item: {fileID: 11400000, guid: 6ed388605fef14d49a111fbfca112a09, type: 2}
+    amount: 10
+    coinPriceSell: 2
+    sellPriceSet: 0
   - item: {fileID: 0}
     amount: 0
+    coinPriceSell: 0
+    sellPriceSet: 0
   - item: {fileID: 0}
     amount: 0
+    coinPriceSell: 0
+    sellPriceSet: 0
   - item: {fileID: 0}
     amount: 0
+    coinPriceSell: 0
+    sellPriceSet: 0
   - item: {fileID: 0}
     amount: 0
+    coinPriceSell: 0
+    sellPriceSet: 0
   - item: {fileID: 0}
     amount: 0
+    coinPriceSell: 0
+    sellPriceSet: 0
   - item: {fileID: 0}
     amount: 0
+    coinPriceSell: 0
+    sellPriceSet: 0
   - item: {fileID: 0}
     amount: 0
+    coinPriceSell: 0
+    sellPriceSet: 0
   - item: {fileID: 0}
     amount: 0
+    coinPriceSell: 0
+    sellPriceSet: 0
   - item: {fileID: 0}
     amount: 0
+    coinPriceSell: 0
+    sellPriceSet: 0
   - item: {fileID: 0}
     amount: 0
+    coinPriceSell: 0
+    sellPriceSet: 0
   - item: {fileID: 0}
     amount: 0
+    coinPriceSell: 0
+    sellPriceSet: 0
   - item: {fileID: 0}
     amount: 0
+    coinPriceSell: 0
+    sellPriceSet: 0
   - item: {fileID: 0}
     amount: 0
+    coinPriceSell: 0
+    sellPriceSet: 0
   - item: {fileID: 0}
     amount: 0
+    coinPriceSell: 0
+    sellPriceSet: 0
   - item: {fileID: 0}
     amount: 0
+    coinPriceSell: 0
+    sellPriceSet: 0
   - item: {fileID: 0}
     amount: 0
-  - item: {fileID: 0}
-    amount: 0
-  - item: {fileID: 0}
-    amount: 0
-  - item: {fileID: 0}
-    amount: 0
-  - item: {fileID: 0}
-    amount: 0
+    coinPriceSell: 0
+    sellPriceSet: 0
   itemDatabase:
   - {fileID: 11400000, guid: 5ecd8e82582f7b94da392ad29187b539, type: 2}
   - {fileID: 11400000, guid: 54531358980005e41b882b277f458e33, type: 2}
@@ -2241,8 +2273,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -8}
-  m_SizeDelta: {x: 160, y: 96}
+  m_AnchoredPosition: {x: 0, y: 23}
+  m_SizeDelta: {x: 160, y: 34}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6196409210611167733
 CanvasRenderer:

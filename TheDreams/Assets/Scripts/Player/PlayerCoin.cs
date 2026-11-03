@@ -62,12 +62,20 @@ public static class PlayerCoin
         return true;
     }
 
-    public static int Earn(ItemData item)
+    public static int Earn(ItemData item, int sellPrice = -1)
     {
-        int price = PriceOf(item);
+        int price = sellPrice >= 0 ? Mathf.Max(0, sellPrice) : SellPriceOf(item);
         if (price > 0)
             Add(price);
         return price;
+    }
+
+    public static int SellPriceOf(ItemData item)
+    {
+        if (item == null)
+            return 0;
+
+        return Mathf.Max(0, item.coinPriceSell);
     }
 
     public static int PriceOf(ItemData item)

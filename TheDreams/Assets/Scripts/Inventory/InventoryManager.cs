@@ -11,6 +11,8 @@ public class InventoryManager : MonoBehaviour
 
     static string[] carryIds;
     static int[] carryAmounts;
+    static int[] carrySell;
+    static bool[] carrySellSet;
     static bool hasCarry;
     static int sessionEpoch;
 
@@ -81,6 +83,8 @@ public class InventoryManager : MonoBehaviour
 
         carryIds = new string[data.Length];
         carryAmounts = new int[data.Length];
+        carrySell = new int[data.Length];
+        carrySellSet = new bool[data.Length];
         for (int i = 0; i < data.Length; i++)
         {
             SavedSlot saved = data[i];
@@ -89,6 +93,8 @@ public class InventoryManager : MonoBehaviour
 
             carryIds[i] = saved.itemId;
             carryAmounts[i] = saved.amount;
+            carrySell[i] = saved.coinPriceSell;
+            carrySellSet[i] = saved.sellPriceSet;
         }
 
         hasCarry = true;
@@ -101,6 +107,8 @@ public class InventoryManager : MonoBehaviour
         hasCarry = false;
         carryIds = null;
         carryAmounts = null;
+        carrySell = null;
+        carrySellSet = null;
     }
 
     public static string ItemKey(ItemData item)
@@ -120,14 +128,18 @@ public class InventoryManager : MonoBehaviour
         int count = slots != null ? slots.Count : 0;
         carryIds = new string[count];
         carryAmounts = new int[count];
+        carrySell = new int[count];
+        carrySellSet = new bool[count];
         for (int i = 0; i < count; i++)
         {
             InventorySlotData slot = slots[i];
-            if (slot == null || slot.item == null || slot.amount <= 0)
+            if (slot == null || !slot.HasItem)
                 continue;
 
             carryIds[i] = ItemKey(slot.item);
             carryAmounts[i] = slot.amount;
+            carrySell[i] = slot.coinPriceSell;
+            carrySellSet[i] = slot.sellPriceSet;
         }
 
         hasCarry = true;
@@ -143,7 +155,9 @@ public class InventoryManager : MonoBehaviour
             data[i] = new SavedSlot
             {
                 itemId = carryIds[i] ?? "",
-                amount = string.IsNullOrEmpty(carryIds[i]) ? 0 : carryAmounts[i]
+                amount = string.IsNullOrEmpty(carryIds[i]) ? 0 : carryAmounts[i],
+                coinPriceSell = carrySell != null && i < carrySell.Length ? carrySell[i] : 0,
+                sellPriceSet = carrySellSet != null && i < carrySellSet.Length && carrySellSet[i]
             };
         }
 
@@ -296,8 +310,7 @@ public class InventoryManager : MonoBehaviour
 
             if (i >= carryAmounts.Length || carryAmounts[i] <= 0 || string.IsNullOrEmpty(carryIds[i]))
             {
-                slots[i].item = null;
-                slots[i].amount = 0;
+                slots[i].Clear();
                 continue;
             }
 
@@ -305,13 +318,17 @@ public class InventoryManager : MonoBehaviour
             if (item == null)
             {
                 Debug.LogWarning("Không tìm thấy item id: " + carryIds[i]);
-                slots[i].item = null;
-                slots[i].amount = 0;
+                slots[i].Clear();
                 continue;
             }
 
             slots[i].item = item;
             slots[i].amount = carryAmounts[i];
+            bool priced = carrySellSet != null && i < carrySellSet.Length && carrySellSet[i];
+            slots[i].sellPriceSet = priced;
+            slots[i].coinPriceSell = priced && carrySell != null && i < carrySell.Length
+                ? carrySell[i]
+                : 0;
         }
 
         if (InventoryUI.Instance != null && InventoryUI.Instance.gameObject.scene == gameObject.scene)
@@ -328,8 +345,7 @@ public class InventoryManager : MonoBehaviour
             if (slots[i] == null)
                 continue;
 
-            slots[i].item = null;
-            slots[i].amount = 0;
+            slots[i].Clear();
         }
     }
 
@@ -357,8 +373,8 @@ public class InventoryManager : MonoBehaviour
 
     private static void ClearSlot(InventorySlotData slot)
     {
-        slot.item = null;
-        slot.amount = 0;
+        if (slot != null)
+            slot.Clear();
     }
 
     private void RefreshUI()

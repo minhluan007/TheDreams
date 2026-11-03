@@ -15,6 +15,10 @@ public class ItemData : ScriptableObject
    [Min(0)]
    public int coinPrice;
 
+   [Min(0)]
+   [Tooltip("Giá NPC trả khi mua món này trên kệ. Có thể đổi trên từng ô trước khi đưa lên kệ.")]
+   public int coinPriceSell;
+
    [TextArea(2, 8)]
    [Tooltip("Mỗi lần xuống dòng là một dòng trên UI shop.")]
    public string description;

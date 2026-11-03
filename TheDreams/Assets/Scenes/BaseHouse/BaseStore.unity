@@ -787,22 +787,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 5256028202666747373, guid: 49fbb95a3335b8943917ddce829233fc, type: 3}
-      propertyPath: offers.Array.data[5].coinPrice
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 5256028202666747373, guid: 49fbb95a3335b8943917ddce829233fc, type: 3}
-      propertyPath: offers.Array.data[6].coinPrice
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 5256028202666747373, guid: 49fbb95a3335b8943917ddce829233fc, type: 3}
-      propertyPath: offers.Array.data[5].description
-      value: "N\u01B0\u1EDBc su\u1ED1i.\nN\u01B0\u1EDBc thi\xEAn nhi\xEAn"
-      objectReference: {fileID: 0}
-    - target: {fileID: 5256028202666747373, guid: 49fbb95a3335b8943917ddce829233fc, type: 3}
-      propertyPath: offers.Array.data[6].description
-      value: "H\u1ED9p r\u1ED7ng.\nD\xF9ng \u0111\u1EC3 ch\u1EE9a v\u1EADt ph\u1EA9m."
-      objectReference: {fileID: 0}
     - target: {fileID: 5979987422299558252, guid: 49fbb95a3335b8943917ddce829233fc, type: 3}
       propertyPath: m_Name
       value: ------ ShopJungle ------

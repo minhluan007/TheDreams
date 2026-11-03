@@ -1,27 +1,31 @@
-// Cot "hanh vi": nhieu action, cach nhau dau phay. De trong thi mac dinh: di, ra.
-// Moi action nhap dung tu khoa, hoac nhap like (bat dau bang tu khoa).
+// Cot "hanh vi": nhieu action, cach nhau dau phay. De trong thi mac dinh: walk, leave.
+// Moi action nhap dung tu khoa tieng Anh, hoac nhap like (bat dau bang tu khoa).
+// Tu khoa cu tieng Viet van duoc nhan: di, xem, chon, mua, doi, tra, dung, ra.
 // Khong phan biet hoa thuong. Dau _ duoc doi thanh dau cach truoc khi so.
-// Vi du like: "xem hang" = xem, "mua do" = mua, "thanh toan" = tra, "roi di" = ra.
-// mua / doi / tra bi bo qua neu khong chon duoc mon, hoac ke khong con hang.
+// Vi du like: "look around" = look, "buy goods" = buy, "pay now" = pay, "leave now" = leave.
+// Moi buy lay them 1 mon. Co the buy nhieu lan roi mot wait, pay cho ca gio.
+// Cung co the wait, pay tung mon, roi choose, buy, wait, pay lan nua.
+// buy / wait / pay bi bo qua neu khong co mon tuong ung, hoac ke khong con hang.
 //
-// di    Di lan luot cac diem o cot "di", khong dung lai. Het diem thi sang action sau.
-//       Dung: di. Like: "di ..." (phai co dau cach) hoac bat dau bang "đi". Vi du: di dao, đi dạo.
-//       "dia" khong tinh la di, vi thieu dau cach sau "di".
-// xem   Cung lo trinh voi di, nhung dung khoang 1.5s o moi diem de xem.
-//       Dung: xem. Like: bat dau bang "xem". Vi du: xem hang, xem ke.
-// chon  Dung truoc ke, chon 1 mon neu ke con hang. Chua lay mon, chua cong coin. Dung khoang 2s.
-//       Dung: chon. Like: bat dau bang "chon" hoac "chọn". Vi du: chon mon, chọn hàng.
-// mua   Toi ke, lay mon da chon khoi ke. Chua cong coin. Dung khoang 1.1s. Khong co mon thi bo qua.
-//       Dung: mua. Like: bat dau bang "mua". Vi du: mua hang, mua do.
-// doi   Toi quay thanh toan, dat mon len ban, dung doi khoang 3s. Khong cam mon thi bo qua.
-//       Dung: doi. Like: bat dau bang "doi" hoac "đợi". Vi du: doi tra, đợi tính tiền.
-// tra   Thanh toan va cong coin. Dung khoang 1.1s. Sang action khac thi lay mon khoi Table_Checkout.
-//       Dung: tra. Like: bat dau bang "tra", "trả", hoac "thanh". Vi du: tra tien, trả tiền, thanh toan.
-// dung  Dung yen tai cho khoang 1.4s.
-//       Dung: dung. Like: bat dau bang "dung" hoac "đứng". Vi du: dung lai, đứng im.
-// ra    Di toi diem destroy roi bien mat, ket thuc luot.
-//       Dung: ra. Like: "ra ..." (phai co dau cach), hoac bat dau bang "roi" / "rời".
-//       Vi du: ra cua, roi di, rời đi. "ranh" khong tinh la ra.
+// walk   Di lan luot cac diem o cot "di", khong dung lai. Het diem thi sang action sau.
+//        Dung: walk. Like: bat dau bang "walk", hoac "di ..." / "đi". Vi du: walk around, di dao.
+//        "dia" khong tinh la walk, vi thieu dau cach sau "di".
+// look   Cung lo trinh voi walk, nhung dung khoang 1.5s o moi diem de xem.
+//        Dung: look. Like: bat dau bang "look" hoac "xem". Vi du: look around, xem hang.
+// choose Dung truoc ke, chon 1 mon neu ke con hang. Chua lay mon, chua cong coin. Dung khoang 2s.
+//        Dung: choose. Like: bat dau bang "choose", "chon" hoac "chọn". Vi du: choose item, chon mon.
+// buy    Toi ke, lay mon vua chon. Moi lan buy them 1 mon. Chua cong coin. Dung khoang 1.1s.
+//        Khong co mon vua chon thi bo qua. Dung: buy. Like: bat dau bang "buy" hoac "mua".
+// wait   Toi quay thanh toan, dat moi mon chua tra len ban, dung doi khoang 3s. Khong cam mon thi bo qua.
+//        Dung: wait. Like: bat dau bang "wait", "doi" hoac "đợi". Vi du: wait to pay, doi tra.
+// pay    Thanh toan moi mon chua tra va cong coin. Dung khoang 1.1s. Xong co the choose, buy tiep.
+//        Sang action khac thi lay mon khoi Table_Checkout.
+//        Dung: pay. Like: bat dau bang "pay", "tra", "trả", hoac "thanh". Vi du: pay now, tra tien.
+// stand  Dung yen tai cho khoang 1.4s.
+//        Dung: stand. Like: bat dau bang "stand", "dung" hoac "đứng". Vi du: stand still, dung lai.
+// leave  Di toi diem destroy roi bien mat, ket thuc luot.
+//        Dung: leave. Like: bat dau bang "leave", "ra ..." (phai co dau cach), hoac "roi" / "rời".
+//        Vi du: leave now, ra cua, roi di. "ranh" khong tinh la leave.
 //
 using System;
 using System.Collections.Generic;
@@ -41,7 +45,7 @@ public class NPCScheduleTable : ScriptableObject
     public const string AssetPath = "Assets/NPC/DataSO/Resources/NPCSchedule.asset";
 
     [TextArea(8, 20)]
-    [Tooltip("Moi dong 1 chang cua NPC. Cung id, nhieu dong = mot ngay, dung thu tu.\nCot cach nhau bang |. Dong bat dau bang # bi bo qua.\n\nid | prefab | map | spawn | di | destroy | xuat hien | roi di | hanh vi\n\nHanh vi: di, xem, chon, mua, doi, tra, dung, ra. Cach nhau dau phay.\nmua: lay mon o ke, chua cong coin. doi: toi WP_CheckoutCounter, dat mon len Table_Checkout, dung 3 giay. tra: thanh toan, cong coin. Sang action khac thi lay mon khoi ban.\nKhong co mua/doi/tra, hoac khong chon duoc mon, thi khach chi xem roi ve.\nDiem di cach nhau dau phay. Gio de trong hoac - neu di tiep ngay.\nNeu co gio roi di, xong hanh vi ma chua toi gio thi NPC di dao walkPoint ngau nhien, xen xem / dung / chon, toi gio moi ra cua.\nSau khi sua text, bam Nap text vao bang.")]
+    [Tooltip("Moi dong 1 chang cua NPC. Cung id, nhieu dong = mot ngay, dung thu tu.\nCot cach nhau bang |. Dong bat dau bang # bi bo qua.\n\nid | prefab | map | spawn | di | destroy | xuat hien | roi di | hanh vi\n\nHanh vi: walk, look, choose, buy, wait, pay, stand, leave. Cach nhau dau phay.\nMoi buy lay them 1 mon. wait dat het mon chua tra len ban. pay cong coin cho het mon do, xong co the mua tiep.\nVi du: walk, look, choose, buy, wait, pay, stand, look, choose, buy, wait, pay, look, leave\nHoac: walk, look, choose, buy, walk, look, choose, buy, wait, pay, stand, look, leave\nKhong co buy/wait/pay, hoac khong chon duoc mon, thi khach chi xem roi ve.\nDiem di cach nhau dau phay. Gio de trong hoac - neu di tiep ngay.\nNeu co gio roi di, xong hanh vi ma chua toi gio thi NPC di dao walkPoint ngau nhien, xen look / stand / choose, toi gio moi leave.\nSau khi sua text, bam Nap text vao bang.")]
     [SerializeField] string sheet;
 
     [SerializeField] NPCScheduleEntry[] entries = Array.Empty<NPCScheduleEntry>();
@@ -233,10 +237,10 @@ public class NPCScheduleEntry
     [Tooltip("Gio xuat hien. 8, 8:30, hoac de trong / - neu chua co dong ho.")]
     public string appearTime = "";
 
-    [Tooltip("Gio roi map. De trong / - thi xong hanh vi moi ra cua. Con gio thi di dao, xem, dung, chon cho den gio do moi ra.")]
+    [Tooltip("Gio roi map. De trong / - thi xong hanh vi moi ra cua. Con gio thi di dao, look, stand, choose cho den gio do moi leave.")]
     public string leaveTime = "";
 
-    [Tooltip("di, xem, chon, mua, doi, tra, dung, ra. Trong thi mac dinh di, ra. mua lay do. doi cho thanh toan. tra cong coin, sang action khac thi lay mon khoi ban. Bo qua mua/doi/tra neu khong chon mon.")]
+    [Tooltip("walk, look, choose, buy, wait, pay, stand, leave. Trong thi mac dinh walk, leave. Moi buy lay them 1 mon. wait dat het mon chua tra. pay cong coin, xong co the mua tiep. Sang action khac thi lay mon khoi ban. Bo qua buy/wait/pay neu khong co mon.")]
     public string actions = "";
 
     public float AppearHour => NPCScheduleTime.ParseHour(appearTime);
@@ -299,6 +303,15 @@ public class NPCScheduleEntry
 
 public static class NPCScheduleTime
 {
+    public const string Walk = "walk";
+    public const string Look = "look";
+    public const string Choose = "choose";
+    public const string Buy = "buy";
+    public const string Wait = "wait";
+    public const string Pay = "pay";
+    public const string Stand = "stand";
+    public const string Leave = "leave";
+
     public static float ParseHour(string text)
     {
         if (string.IsNullOrWhiteSpace(text))
@@ -349,7 +362,7 @@ public static class NPCScheduleTime
     {
         string[] parts = SplitNames(text);
         if (parts.Length == 0)
-            return new[] { "di", "ra" };
+            return new[] { Walk, Leave };
 
         var actions = new string[parts.Length];
         for (int i = 0; i < parts.Length; i++)
@@ -361,32 +374,33 @@ public static class NPCScheduleTime
     public static string NormalizeAction(string action)
     {
         if (string.IsNullOrWhiteSpace(action))
-            return "di";
+            return Walk;
 
         string value = action.Trim().ToLowerInvariant().Replace('_', ' ');
-        if (value.StartsWith("chon") || value.StartsWith("chọn"))
-            return "chon";
-        if (value.StartsWith("mua"))
-            return "mua";
-        if (value.StartsWith("doi") || value.StartsWith("đợi"))
-            return "doi";
-        if (value.StartsWith("tra") || value.StartsWith("trả") || value.StartsWith("thanh"))
-            return "tra";
-        if (value.StartsWith("xem"))
-            return "xem";
-        if (value.StartsWith("dung") || value.StartsWith("đứng"))
-            return "dung";
-        if (value == "ra" || value.StartsWith("roi") || value.StartsWith("rời") || value.StartsWith("ra "))
-            return "ra";
-        if (value == "di" || value.StartsWith("di ") || value.StartsWith("đi"))
-            return "di";
+        if (value.StartsWith(Choose) || value.StartsWith("chon") || value.StartsWith("chọn"))
+            return Choose;
+        if (value.StartsWith(Buy) || value.StartsWith("mua"))
+            return Buy;
+        if (value.StartsWith(Wait) || value.StartsWith("doi") || value.StartsWith("đợi"))
+            return Wait;
+        if (value.StartsWith(Pay) || value.StartsWith("tra") || value.StartsWith("trả") || value.StartsWith("thanh"))
+            return Pay;
+        if (value.StartsWith(Look) || value.StartsWith("xem"))
+            return Look;
+        if (value.StartsWith(Stand) || value.StartsWith("dung") || value.StartsWith("đứng"))
+            return Stand;
+        if (value == Leave || value.StartsWith(Leave) || value == "ra" || value.StartsWith("ra ")
+            || value.StartsWith("roi") || value.StartsWith("rời"))
+            return Leave;
+        if (value == Walk || value.StartsWith(Walk) || value == "di" || value.StartsWith("di ") || value.StartsWith("đi"))
+            return Walk;
 
         return value;
     }
 
     public static bool IsPurchaseAction(string action)
     {
-        return action == "mua" || action == "doi" || action == "tra";
+        return action == Buy || action == Wait || action == Pay;
     }
 
     static float ClampHour(float hour)
@@ -409,51 +423,51 @@ public class NPCScheduleTableEditor : Editor
     {
         new[]
         {
-            "di",
+            "walk",
             "Di lan luot cac diem o cot \"di\", khong dung lai. Het diem thi sang action sau.",
-            "Dung: di. Like: \"di ...\" (phai co dau cach) hoac bat dau bang \"đi\". Vi du: di dao, đi dạo. \"dia\" khong tinh."
+            "Dung: walk. Like: bat dau bang \"walk\", hoac \"di ...\" / \"đi\". Vi du: walk around, di dao. \"dia\" khong tinh."
         },
         new[]
         {
-            "xem",
-            "Cung lo trinh voi di, nhung dung khoang 1.5s o moi diem de xem.",
-            "Dung: xem. Like: bat dau bang \"xem\". Vi du: xem hang, xem ke."
+            "look",
+            "Cung lo trinh voi walk, nhung dung khoang 1.5s o moi diem de xem.",
+            "Dung: look. Like: bat dau bang \"look\" hoac \"xem\". Vi du: look around, xem hang."
         },
         new[]
         {
-            "chon",
+            "choose",
             "Dung truoc ke, chon 1 mon neu ke con hang. Chua lay mon, chua cong coin. Dung khoang 2s.",
-            "Dung: chon. Like: bat dau bang \"chon\" hoac \"chọn\". Vi du: chon mon, chọn hàng."
+            "Dung: choose. Like: bat dau bang \"choose\", \"chon\" hoac \"chọn\". Vi du: choose item, chon mon."
         },
         new[]
         {
-            "mua",
-            "Toi ke, lay mon da chon khoi ke. Chua cong coin. Dung khoang 1.1s. Khong co mon thi bo qua.",
-            "Dung: mua. Like: bat dau bang \"mua\". Vi du: mua hang, mua do."
+            "buy",
+            "Toi ke, lay mon vua chon. Moi lan buy them 1 mon, co the buy nhieu lan truoc khi wait. Chua cong coin. Dung khoang 1.1s. Khong co mon vua chon thi bo qua.",
+            "Dung: buy. Like: bat dau bang \"buy\" hoac \"mua\". Vi du: buy goods, mua hang."
         },
         new[]
         {
-            "doi",
-            "Toi quay thanh toan, dat mon len ban, dung doi khoang 3s. Khong cam mon thi bo qua.",
-            "Dung: doi. Like: bat dau bang \"doi\" hoac \"đợi\". Vi du: doi tra, đợi tính tiền."
+            "wait",
+            "Toi quay thanh toan, dat moi mon chua tra len ban, dung doi khoang 3s. Khong cam mon thi bo qua.",
+            "Dung: wait. Like: bat dau bang \"wait\", \"doi\" hoac \"đợi\". Vi du: wait to pay, doi tra."
         },
         new[]
         {
-            "tra",
-            "Thanh toan va cong coin. Dung khoang 1.1s. Sang action khac thi lay mon khoi Table_Checkout.",
-            "Dung: tra. Like: bat dau bang \"tra\", \"trả\", hoac \"thanh\". Vi du: tra tien, trả tiền, thanh toan."
+            "pay",
+            "Thanh toan moi mon chua tra va cong coin. Dung khoang 1.1s. Xong co the choose, buy tiep. Sang action khac thi lay mon khoi Table_Checkout.",
+            "Dung: pay. Like: bat dau bang \"pay\", \"tra\", \"trả\", hoac \"thanh\". Vi du: pay now, tra tien, thanh toan."
         },
         new[]
         {
-            "dung",
+            "stand",
             "Dung yen tai cho khoang 1.4s.",
-            "Dung: dung. Like: bat dau bang \"dung\" hoac \"đứng\". Vi du: dung lai, đứng im."
+            "Dung: stand. Like: bat dau bang \"stand\", \"dung\" hoac \"đứng\". Vi du: stand still, dung lai."
         },
         new[]
         {
-            "ra",
+            "leave",
             "Di toi diem destroy roi bien mat, ket thuc luot.",
-            "Dung: ra. Like: \"ra ...\" (phai co dau cach), hoac bat dau bang \"roi\" / \"rời\". Vi du: ra cua, roi di, rời đi. \"ranh\" khong tinh."
+            "Dung: leave. Like: bat dau bang \"leave\", \"ra ...\" (phai co dau cach), hoac \"roi\" / \"rời\". Vi du: leave now, ra cua, roi di. \"ranh\" khong tinh."
         }
     };
 
@@ -497,11 +511,13 @@ public class NPCScheduleTableEditor : Editor
         }
 
         EditorGUILayout.HelpBox(
-            "Cot hanh vi: nhieu action, cach nhau dau phay. De trong = di, ra.\n" +
-            "Nhap dung tu khoa, hoac nhap like (bat dau bang tu khoa).\n" +
+            "Cot hanh vi: nhieu action, cach nhau dau phay. De trong = walk, leave.\n" +
+            "Tu khoa: walk, look, choose, buy, wait, pay, stand, leave.\n" +
+            "Nhap dung tu khoa, hoac nhap like (bat dau bang tu khoa). Tu Viet cu van dung: di, xem, chon, mua, doi, tra, dung, ra.\n" +
             "Khong phan biet hoa thuong. Dau _ doi thanh dau cach.\n" +
-            "Vi du like: \"xem hang\" = xem, \"mua do\" = mua, \"thanh toan\" = tra, \"roi di\" = ra.\n" +
-            "mua / doi / tra bi bo qua neu khong chon duoc mon, hoac ke khong con hang.",
+            "Moi buy lay them 1 mon. Nhieu buy roi mot wait, pay = tra mot lan cho ca gio.\n" +
+            "wait, pay xen giua = tra tung mon, roi choose, buy, wait, pay lan nua.\n" +
+            "buy / wait / pay bi bo qua neu khong co mon tuong ung, hoac ke khong con hang.",
             MessageType.Info);
 
         for (int i = 0; i < ActionNotes.Length; i++)

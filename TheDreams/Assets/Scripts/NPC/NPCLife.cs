@@ -18,10 +18,19 @@ public static class NPCTiming
     public const float PayWaitSeconds = 3f;
 }
 
+public class NPCGood
+{
+    public ItemData item;
+    public int sellPrice;
+    public bool placed;
+    public bool paid;
+}
+
 public class NPCActor
 {
     public string id;
     public readonly List<NPCScheduleEntry> visits = new List<NPCScheduleEntry>();
+    public readonly List<NPCGood> goods = new List<NPCGood>();
     public int visitIndex;
     public int actionIndex;
     public NPCPresence presence;
@@ -40,13 +49,125 @@ public class NPCActor
     public bool completing;
     public bool wantsItem;
     public bool looked;
-    public ItemData heldItem;
-    public bool itemPlaced;
-    public bool paid;
     public string shelfName;
     public int shelfSlot = -1;
     public NPC body;
     public bool warned;
+
+    public bool HasUnpaid
+    {
+        get
+        {
+            for (int i = 0; i < goods.Count; i++)
+            {
+                if (!goods[i].paid)
+                    return true;
+            }
+
+            return false;
+        }
+    }
+
+    public bool UnpaidOnTable
+    {
+        get
+        {
+            bool any = false;
+            for (int i = 0; i < goods.Count; i++)
+            {
+                if (goods[i].paid)
+                    continue;
+
+                if (!goods[i].placed)
+                    return false;
+
+                any = true;
+            }
+
+            return any;
+        }
+    }
+
+    public bool AnyOnTable
+    {
+        get
+        {
+            for (int i = 0; i < goods.Count; i++)
+            {
+                if (goods[i].placed)
+                    return true;
+            }
+
+            return false;
+        }
+    }
+
+    public void AddGood(ItemData item, int sellPrice)
+    {
+        goods.Add(new NPCGood
+        {
+            item = item,
+            sellPrice = sellPrice
+        });
+    }
+
+    public void PlaceUnpaid()
+    {
+        for (int i = 0; i < goods.Count; i++)
+        {
+            if (!goods[i].paid)
+                goods[i].placed = true;
+        }
+    }
+
+    public void CopyPlaced(List<ItemData> into)
+    {
+        into.Clear();
+        for (int i = 0; i < goods.Count; i++)
+        {
+            if (goods[i].placed && goods[i].item != null)
+                into.Add(goods[i].item);
+        }
+    }
+
+    public void LiftFromTable()
+    {
+        for (int i = goods.Count - 1; i >= 0; i--)
+        {
+            if (goods[i].paid)
+                goods.RemoveAt(i);
+            else
+                goods[i].placed = false;
+        }
+    }
+
+    public int PayUnpaid(out string label)
+    {
+        int total = 0;
+        int count = 0;
+        string text = string.Empty;
+        for (int i = 0; i < goods.Count; i++)
+        {
+            NPCGood good = goods[i];
+            if (good.paid)
+                continue;
+
+            total += PlayerCoin.Earn(good.item, good.sellPrice);
+            good.paid = true;
+            if (count > 0)
+                text += ", ";
+
+            text += good.item != null ? good.item.Label : "mon";
+            count++;
+        }
+
+        if (count <= 1)
+            label = count == 1 ? text : "mon";
+        else
+            label = count + " mon (" + text + ")";
+
+        return total;
+    }
 
     public NPCScheduleEntry Entry =>
         visitIndex >= 0 && visitIndex < visits.Count ? visits[visitIndex] : null;
@@ -65,7 +186,7 @@ public class NPCActor
         get
         {
             if (forcedLeave)
-                return "ra";
+                return NPCScheduleTime.Leave;
 
             if (fillingTime && !string.IsNullOrEmpty(fillAction))
                 return fillAction;
@@ -113,9 +234,7 @@ public class NPCActor
         fillDuration = 0f;
         frozen = false;
         wantsItem = false;
-        heldItem = null;
-        itemPlaced = false;
-        paid = false;
+        goods.Clear();
         shelfName = null;
         shelfSlot = -1;
         BeginAction();
@@ -145,34 +264,34 @@ public class NPCActor
 
         if (!canWalk)
         {
-            fillAction = store && roll < 4 ? "chon" : "dung";
+            fillAction = store && roll < 4 ? NPCScheduleTime.Choose : NPCScheduleTime.Stand;
         }
         else if (!store)
         {
-            fillAction = roll < 3 ? "dung" : "di";
+            fillAction = roll < 3 ? NPCScheduleTime.Stand : NPCScheduleTime.Walk;
         }
         else if (roll < 5)
         {
-            fillAction = "di";
+            fillAction = NPCScheduleTime.Walk;
         }
         else if (roll < 7)
         {
-            fillAction = "xem";
+            fillAction = NPCScheduleTime.Look;
         }
         else if (roll < 9)
         {
-            fillAction = "dung";
+            fillAction = NPCScheduleTime.Stand;
         }
         else
         {
-            fillAction = "chon";
+            fillAction = NPCScheduleTime.Choose;
         }
 
-        if (fillAction == "dung")
+        if (fillAction == NPCScheduleTime.Stand)
             fillDuration = Random.Range(1.4f, 3.4f);
-        else if (fillAction == "chon")
+        else if (fillAction == NPCScheduleTime.Choose)
             fillDuration = Random.Range(1.6f, 3f);
-        else if (fillAction == "xem")
+        else if (fillAction == NPCScheduleTime.Look)
             fillDuration = NPCTiming.PointSeconds + NPCTiming.BrowsePause;
         else
             fillDuration = Random.Range(2.4f, 4.2f);
@@ -188,7 +307,8 @@ public class NPCActor
         for (int i = 0; i < names.Length; i++)
         {
             string name = names[i];
-            if (name == "xem" || name == "chon" || name == "mua" || name == "doi" || name == "tra")
+            if (name == NPCScheduleTime.Look || name == NPCScheduleTime.Choose || name == NPCScheduleTime.Buy
+                || name == NPCScheduleTime.Wait || name == NPCScheduleTime.Pay)
                 return true;
         }
 

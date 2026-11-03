@@ -132,7 +132,7 @@ public class NPCManager : MonoBehaviour
             Debug.Log("NPC " + actor.id + " khong mua, chi xem.");
 
         bool scriptDone = actor.actionIndex >= actor.ActionCount;
-        bool exitStep = !scriptDone && actor.Action == "ra";
+        bool exitStep = !scriptDone && actor.Action == NPCScheduleTime.Leave;
         if (scriptDone || exitStep)
         {
             if (ShouldFill(actor))
@@ -345,7 +345,7 @@ public class NPCManager : MonoBehaviour
         actor.fillAction = null;
         actor.forcedLeave = false;
 
-        int ra = actor.FindAction("ra");
+        int ra = actor.FindAction(NPCScheduleTime.Leave);
         if (ra >= 0)
         {
             if (!wasFilling && actor.actionIndex == ra)
@@ -386,7 +386,10 @@ public class NPCManager : MonoBehaviour
 
     void StepHidden(NPCActor actor, float dt)
     {
-        if (actor.fillingTime && (actor.Action == "di" || actor.Action == "xem"))
+        if (actor.Action != NPCScheduleTime.Wait && actor.Action != NPCScheduleTime.Pay)
+            actor.LiftFromTable();
+
+        if (actor.fillingTime && (actor.Action == NPCScheduleTime.Walk || actor.Action == NPCScheduleTime.Look))
         {
             float need = actor.fillDuration > 0f ? actor.fillDuration : NPCTiming.PointSeconds;
             actor.timer += dt;
@@ -395,7 +398,7 @@ public class NPCManager : MonoBehaviour
             return;
         }
 
-        if (actor.reachedEnd && (actor.Action == "di" || actor.Action == "xem"))
+        if (actor.reachedEnd && (actor.Action == NPCScheduleTime.Walk || actor.Action == NPCScheduleTime.Look))
         {
             AdvanceAction(actor);
             return;
@@ -403,8 +406,8 @@ public class NPCManager : MonoBehaviour
 
         switch (actor.Action)
         {
-            case "di":
-            case "xem":
+            case NPCScheduleTime.Walk:
+            case NPCScheduleTime.Look:
                 int count = actor.Entry.WalkPointNames.Length;
                 if (count == 0)
                 {
@@ -412,7 +415,7 @@ public class NPCManager : MonoBehaviour
                     return;
                 }
 
-                float need = NPCTiming.PointSeconds + (actor.Action == "xem" ? NPCTiming.BrowsePause : 0f);
+                float need = NPCTiming.PointSeconds + (actor.Action == NPCScheduleTime.Look ? NPCTiming.BrowsePause : 0f);
                 actor.timer += dt;
                 if (actor.timer < need)
                     return;
@@ -423,49 +426,49 @@ public class NPCManager : MonoBehaviour
                 if (actor.pointIndex >= count)
                     AdvanceAction(actor);
                 break;
-            case "chon":
+            case NPCScheduleTime.Choose:
                 actor.timer += dt;
                 if (actor.timer < ActionSeconds(actor, NPCTiming.ChooseSeconds))
                     return;
 
                 actor.looked = true;
-                if (!actor.fillingTime)
-                    actor.wantsItem = ShelfStock.HasStock(actor.Entry.mapName);
+                if (!actor.fillingTime && ShelfStock.HasStock(actor.Entry.mapName))
+                    actor.wantsItem = true;
                 AdvanceAction(actor);
                 break;
-            case "mua":
-                if (actor.heldItem == null)
+            case NPCScheduleTime.Buy:
+                if (actor.wantsItem)
                 {
-                    if (actor.wantsItem && ShelfStock.TryTakeAny(actor.Entry.mapName, out ItemData item))
-                        actor.heldItem = item;
-                    else
+                    if (!ShelfStock.TryTakeAny(actor.Entry.mapName, out ItemData item, out int sellPrice))
+                    {
                         actor.wantsItem = false;
-                }
+                        AdvanceAction(actor);
+                        return;
+                    }
 
-                if (actor.heldItem == null)
-                {
-                    AdvanceAction(actor);
-                    return;
+                    actor.wantsItem = false;
+                    actor.AddGood(item, sellPrice);
+                    actor.timer = 0f;
                 }
 
                 actor.timer += dt;
                 if (actor.timer >= NPCTiming.BuySeconds)
                     AdvanceAction(actor);
                 break;
-            case "doi":
-                if (actor.heldItem == null || actor.paid)
+            case NPCScheduleTime.Wait:
+                if (!actor.HasUnpaid)
                 {
                     AdvanceAction(actor);
                     return;
                 }
 
-                if (!actor.itemPlaced)
+                if (!actor.UnpaidOnTable)
                 {
                     actor.timer += dt;
                     if (actor.timer < NPCTiming.PointSeconds)
                         return;
 
-                    actor.itemPlaced = true;
+                    actor.PlaceUnpaid();
                     actor.timer = 0f;
                     return;
                 }
@@ -474,12 +477,10 @@ public class NPCManager : MonoBehaviour
                 if (actor.timer >= NPCTiming.PayWaitSeconds)
                     AdvanceAction(actor);
                 break;
-            case "tra":
-                if (!actor.paid)
+            case NPCScheduleTime.Pay:
+                if (actor.HasUnpaid)
                 {
-                    actor.paid = true;
-                    int coins = PlayerCoin.Earn(actor.heldItem);
-                    string label = actor.heldItem != null ? actor.heldItem.Label : "mon";
+                    int coins = actor.PayUnpaid(out string label);
                     Debug.Log("NPC " + actor.id + " thanh toan " + label + " (+" + coins + " coin).");
                 }
 
@@ -487,12 +488,12 @@ public class NPCManager : MonoBehaviour
                 if (actor.timer >= NPCTiming.BuySeconds)
                     AdvanceAction(actor);
                 break;
-            case "dung":
+            case NPCScheduleTime.Stand:
                 actor.timer += dt;
                 if (actor.timer >= ActionSeconds(actor, NPCTiming.StandSeconds))
                     AdvanceAction(actor);
                 break;
-            case "ra":
+            case NPCScheduleTime.Leave:
                 actor.timer += dt;
                 if (actor.timer >= NPCTiming.PointSeconds)
                     CompleteVisit(actor);
@@ -558,11 +559,12 @@ public class NPCManager : MonoBehaviour
 
         string[] points = entry.WalkPointNames;
         string action = actor.Action;
-        if ((action == "tra" || (action == "doi" && actor.itemPlaced))
+        if ((action == NPCScheduleTime.Pay || (action == NPCScheduleTime.Wait && actor.UnpaidOnTable))
             && TryFind(CheckoutTable.CounterPointName, out position))
             return true;
 
-        if ((action == "chon" || action == "mua" || action == "doi" || action == "dung" || actor.reachedEnd) && points.Length > 0)
+        if ((action == NPCScheduleTime.Choose || action == NPCScheduleTime.Buy || action == NPCScheduleTime.Wait
+            || action == NPCScheduleTime.Stand || actor.reachedEnd) && points.Length > 0)
         {
             if (TryFind(points[points.Length - 1], out position))
                 return true;
@@ -575,7 +577,7 @@ public class NPCManager : MonoBehaviour
                 return true;
         }
 
-        if (action == "ra" && points.Length > 0 && TryFind(points[points.Length - 1], out position))
+        if (action == NPCScheduleTime.Leave && points.Length > 0 && TryFind(points[points.Length - 1], out position))
             return true;
 
         return TryFind(entry.spawnPointName, out position);
@@ -591,10 +593,17 @@ public class NPCManager : MonoBehaviour
 
     static bool SkipWithoutGoods(NPCActor actor)
     {
-        if (actor == null || !NPCScheduleTime.IsPurchaseAction(actor.Action))
+        if (actor == null)
             return false;
 
-        return actor.heldItem == null && !actor.wantsItem;
+        string action = actor.Action;
+        if (action == NPCScheduleTime.Buy)
+            return !actor.wantsItem;
+
+        if (action == NPCScheduleTime.Wait || action == NPCScheduleTime.Pay)
+            return !actor.HasUnpaid;
+
+        return false;
     }
 
     static bool TryRandomPoint(string[] names, out Vector3 position)

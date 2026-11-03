@@ -41,11 +41,11 @@ Lich NPC nam o Assets/NPC/DataSO/Resources/NPCSchedule.
 Moi dong la mot chang, khong phai mot NPC moi:
 id | prefab | map | spawn | di | destroy | xuat hien | roi di | hanh vi
 Cung id, nhieu dong, dung thu tu = mot ngay.
-Hanh vi: di, xem, chon, mua, doi, tra, dung, ra.
-mua lay mon o ke, chua cong coin.
-doi toi WP_CheckoutCounter, dat mon len Table_Checkout, dung 3 giay.
-tra moi cong coin. Sang action khac thi lay mon khoi Table_Checkout. Scene player bam ban se lam sau.
-Khong co mua/doi/tra, hoac ke trong, thi khach chi xem roi ve.
+Hanh vi: walk, look, choose, buy, wait, pay, stand, leave.
+Moi buy lay them 1 mon o ke, chua cong coin. Co the buy nhieu lan roi mot wait, pay.
+wait toi WP_CheckoutCounter, dat moi mon chua tra len Table_Checkout, dung 3 giay.
+pay cong coin cho het mon do. Xong co the choose, buy tiep. Sang action khac thi lay mon khoi ban.
+Khong co buy/wait/pay, hoac ke trong, thi khach chi xem roi ve.
 Dong ho la LifeTime. NPCSchedule doc gio xuat hien / roi di tu LifeTime. NPC chua toi gio thi chua co mat.
 Doi map khong reset: NPC tiep tuc dung chang dang lam.
 Xong chang nay thi sang chang sau (vao cua hang, roi ra).";
