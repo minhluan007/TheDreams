@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class NPCMapTraveler : MonoBehaviour
@@ -14,6 +15,7 @@ public class NPCMapTraveler : MonoBehaviour
     bool pendingAdvance;
     bool pendingComplete;
     string lastWanderName;
+    readonly List<ItemData> tableItems = new List<ItemData>();
 
     void Awake()
     {
@@ -58,15 +60,15 @@ public class NPCMapTraveler : MonoBehaviour
         seekingShelf = false;
         seekingCounter = false;
         string action = actor.Action;
-        if (actor.itemPlaced && action != "doi" && action != "tra")
+        if (action != NPCScheduleTime.Wait && action != NPCScheduleTime.Pay)
             ReleaseCheckoutItem();
 
-        if (action == "di" || action == "xem")
+        if (action == NPCScheduleTime.Walk || action == NPCScheduleTime.Look)
         {
             move.SetPaused(false);
             if (actor.fillingTime)
             {
-                move.dwellOnArrival = action == "xem"
+                move.dwellOnArrival = action == NPCScheduleTime.Look
                     ? NPCTiming.BrowsePause
                     : Random.Range(0.5f, 1.6f);
                 if (!SeekRandomWalkPoint())
@@ -74,43 +76,45 @@ public class NPCMapTraveler : MonoBehaviour
                 return;
             }
 
-            move.dwellOnArrival = action == "xem" ? NPCTiming.BrowsePause : 0f;
+            move.dwellOnArrival = action == NPCScheduleTime.Look ? NPCTiming.BrowsePause : 0f;
             if (!move.BindNamedPoints(actor.Entry.WalkPointNames, actor.pointIndex))
                 pendingAdvance = true;
             return;
         }
 
-        if (action == "ra")
+        if (action == NPCScheduleTime.Leave)
         {
             move.SetPaused(false);
             move.dwellOnArrival = 0f;
             return;
         }
 
-        if (action == "mua")
+        if (action == NPCScheduleTime.Buy)
         {
             BeginPickup();
             return;
         }
 
-        if (action == "doi")
+        if (action == NPCScheduleTime.Wait)
         {
             BeginCheckout();
             return;
         }
 
-        if (action == "tra")
+        if (action == NPCScheduleTime.Pay)
         {
             move.StopAndStay();
-            if (!actor.paid)
+            if (actor.HasUnpaid)
                 Pay();
+            if (actor.AnyOnTable)
+                ShowOnTable();
             return;
         }
 
         move.StopAndStay();
-        if (action == "chon" && !actor.looked)
+        if (action == NPCScheduleTime.Choose && !actor.looked)
             ChooseItem();
-        else if (action != "dung")
+        else if (action != NPCScheduleTime.Stand)
             pendingAdvance = true;
     }
 
@@ -166,32 +170,31 @@ public class NPCMapTraveler : MonoBehaviour
 
         switch (actor.Action)
         {
-            case "di":
-            case "xem":
+            case NPCScheduleTime.Walk:
+            case NPCScheduleTime.Look:
                 if (move.HasReachedEnd)
                     NPCManager.AdvanceAction(actor);
                 break;
-            case "dung":
+            case NPCScheduleTime.Stand:
                 actor.timer += Time.deltaTime;
                 if (actor.timer >= WaitSeconds(NPCTiming.StandSeconds))
                     NPCManager.AdvanceAction(actor);
                 break;
-            case "chon":
+            case NPCScheduleTime.Choose:
                 actor.timer += Time.deltaTime;
                 if (actor.timer >= WaitSeconds(NPCTiming.ChooseSeconds))
                     NPCManager.AdvanceAction(actor);
                 break;
-            case "mua":
-                if (actor.heldItem == null)
+            case NPCScheduleTime.Buy:
+                if (actor.wantsItem)
                 {
                     if (seekingShelf && !move.HasReachedEnd)
                         break;
 
-                    TakeItem();
                     actor.timer = 0f;
                     seekingShelf = false;
                     move.StopAndStay();
-                    if (actor.heldItem == null)
+                    if (!TakeItem())
                     {
                         NPCManager.AdvanceAction(actor);
                         break;
@@ -202,17 +205,17 @@ public class NPCMapTraveler : MonoBehaviour
                 if (actor.timer >= NPCTiming.BuySeconds)
                     NPCManager.AdvanceAction(actor);
                 break;
-            case "doi":
-                if (actor.heldItem == null)
+            case NPCScheduleTime.Wait:
+                if (!actor.HasUnpaid)
                 {
                     NPCManager.AdvanceAction(actor);
                     break;
                 }
 
-                if (!actor.itemPlaced)
+                if (!actor.UnpaidOnTable)
                 {
                     if (!seekingCounter || move.HasReachedEnd)
-                        PlaceItem();
+                        PlaceItems();
                     break;
                 }
 
@@ -220,12 +223,12 @@ public class NPCMapTraveler : MonoBehaviour
                 if (actor.timer >= NPCTiming.PayWaitSeconds)
                     NPCManager.AdvanceAction(actor);
                 break;
-            case "tra":
+            case NPCScheduleTime.Pay:
                 actor.timer += Time.deltaTime;
                 if (actor.timer >= NPCTiming.BuySeconds)
                     NPCManager.AdvanceAction(actor);
                 break;
-            case "ra":
+            case NPCScheduleTime.Leave:
                 if (!seekingExit)
                 {
                     seekingExit = true;
@@ -256,25 +259,23 @@ public class NPCMapTraveler : MonoBehaviour
         if (actor.fillingTime)
             return;
 
-        actor.wantsItem = false;
-        actor.shelfSlot = -1;
-        actor.shelfName = null;
-        if (shelf == null || !shelf.TryChooseSlot(out int slot, out _))
+        if (shelf != null && shelf.TryChooseSlot(out int slot, out _))
+        {
+            actor.wantsItem = true;
+            actor.shelfSlot = slot;
+            actor.shelfName = shelf.gameObject.name;
             return;
+        }
 
-        actor.wantsItem = true;
-        actor.shelfSlot = slot;
-        actor.shelfName = shelf.gameObject.name;
+        if (!actor.wantsItem)
+        {
+            actor.shelfSlot = -1;
+            actor.shelfName = null;
+        }
     }
 
     void BeginPickup()
     {
-        if (actor.heldItem != null)
-        {
-            move.StopAndStay();
-            return;
-        }
-
         if (!actor.wantsItem)
         {
             pendingAdvance = true;
@@ -288,20 +289,19 @@ public class NPCMapTraveler : MonoBehaviour
             return;
 
         move.StopAndStay();
-        TakeItem();
-        if (actor.heldItem == null)
+        if (!TakeItem())
             pendingAdvance = true;
     }
 
     void BeginCheckout()
     {
-        if (actor.heldItem == null || actor.paid)
+        if (!actor.HasUnpaid)
         {
             pendingAdvance = true;
             return;
         }
 
-        if (actor.itemPlaced)
+        if (actor.UnpaidOnTable)
         {
             move.StopAndStay();
             ShowOnTable();
@@ -312,7 +312,7 @@ public class NPCMapTraveler : MonoBehaviour
         move.dwellOnArrival = 0f;
         seekingCounter = SeekCounter();
         if (!seekingCounter)
-            PlaceItem();
+            PlaceItems();
     }
 
     bool SeekShelf()
@@ -352,38 +352,67 @@ public class NPCMapTraveler : MonoBehaviour
         return true;
     }
 
-    void TakeItem()
+    bool TakeItem()
     {
-        if (actor.heldItem != null)
-            return;
+        if (!actor.wantsItem)
+            return false;
 
         ShelfInventory shelf = ShelfInventory.FindNamed(actor.shelfName);
         if (shelf == null)
             shelf = ShelfInventory.FindForNpc(transform.position);
 
-        if (shelf == null || !shelf.TryTakeSlot(actor.shelfSlot, out ItemData item))
-        {
-            actor.wantsItem = false;
-            return;
-        }
+        ItemData item = null;
+        int sellPrice = 0;
+        bool took = shelf != null && shelf.TryTakeSlot(actor.shelfSlot, out item, out sellPrice);
+        if (!took && shelf != null && shelf.TryChooseSlot(out int slot, out _))
+            took = shelf.TryTakeSlot(slot, out item, out sellPrice);
 
-        actor.heldItem = item;
-        actor.wantsItem = true;
+        actor.wantsItem = false;
+        actor.shelfSlot = -1;
+        if (!took)
+            return false;
+
+        actor.AddGood(item, sellPrice);
         move.FaceTowards(shelf.transform.position);
         Debug.Log("NPC " + actor.id + " lay " + item.Label + " o ke.");
+        return true;
     }
 
-    void PlaceItem()
+    void PlaceItems()
     {
-        if (actor.itemPlaced || actor.heldItem == null)
+        if (!actor.HasUnpaid || actor.UnpaidOnTable)
             return;
 
-        actor.itemPlaced = true;
+        string label = UnpaidLabel();
+        actor.PlaceUnpaid();
         actor.timer = 0f;
         seekingCounter = false;
         move.StopAndStay();
         ShowOnTable();
-        Debug.Log("NPC " + actor.id + " dat " + actor.heldItem.Label + " len ban.");
+        Debug.Log("NPC " + actor.id + " dat " + label + " len ban.");
+    }
+
+    string UnpaidLabel()
+    {
+        int count = 0;
+        string text = string.Empty;
+        for (int i = 0; i < actor.goods.Count; i++)
+        {
+            NPCGood good = actor.goods[i];
+            if (good.paid)
+                continue;
+
+            if (count > 0)
+                text += ", ";
+
+            text += good.item != null ? good.item.Label : "mon";
+            count++;
+        }
+
+        if (count <= 1)
+            return count == 1 ? text : "mon";
+
+        return count + " mon (" + text + ")";
     }
 
     void ShowOnTable()
@@ -395,32 +424,30 @@ public class NPCMapTraveler : MonoBehaviour
             return;
         }
 
-        table.Place(actor.heldItem, actor.id);
+        actor.CopyPlaced(tableItems);
+        table.Show(tableItems, actor.id);
         move.FaceTowards(table.transform.position);
     }
 
     public void ReleaseCheckoutItem()
     {
-        if (actor == null || !actor.itemPlaced)
+        if (actor == null || !actor.AnyOnTable)
             return;
 
         CheckoutTable table = CheckoutTable.FindTable();
         if (table != null)
             table.ClearOwned(actor.id);
 
-        actor.itemPlaced = false;
+        actor.LiftFromTable();
     }
 
     void Pay()
     {
-        if (actor.paid)
+        if (!actor.HasUnpaid)
             return;
 
-        actor.paid = true;
-        ItemData item = actor.heldItem;
-        // Coin cong ngay khi tra. Scene player bam ban se thay cho buoc nay sau.
-        int coins = PlayerCoin.Earn(item);
-        string label = item != null ? item.Label : "mon";
+        // Coin cong ngay khi pay. Scene player bam ban se thay cho buoc nay sau.
+        int coins = actor.PayUnpaid(out string label);
         Debug.Log("NPC " + actor.id + " thanh toan " + label + " (+" + coins + " coin).");
     }
 
@@ -499,7 +526,7 @@ public class NPCMapTraveler : MonoBehaviour
         if (actor == null || actor.body != npc || actor.frozen)
             return;
 
-        if (Time.time < ignoreUntil || actor.Action != "ra")
+        if (Time.time < ignoreUntil || actor.Action != NPCScheduleTime.Leave)
             return;
 
         if (other.GetComponent<MapExit>() == null)

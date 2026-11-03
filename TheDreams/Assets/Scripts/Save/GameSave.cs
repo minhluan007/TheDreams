@@ -8,6 +8,8 @@ public class SavedSlot
 {
     public string itemId;
     public int amount;
+    public int coinPriceSell;
+    public bool sellPriceSet;
 }
 
 [Serializable]

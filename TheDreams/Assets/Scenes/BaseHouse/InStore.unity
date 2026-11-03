@@ -228,16 +228,28 @@ MonoBehaviour:
   slots:
   - item: {fileID: 0}
     amount: 0
+    coinPriceSell: 0
+    sellPriceSet: 0
   - item: {fileID: 0}
     amount: 0
+    coinPriceSell: 0
+    sellPriceSet: 0
   - item: {fileID: 0}
     amount: 0
+    coinPriceSell: 0
+    sellPriceSet: 0
   - item: {fileID: 0}
     amount: 0
+    coinPriceSell: 0
+    sellPriceSet: 0
   - item: {fileID: 0}
     amount: 0
+    coinPriceSell: 0
+    sellPriceSet: 0
   - item: {fileID: 0}
     amount: 0
+    coinPriceSell: 0
+    sellPriceSet: 0
   shelfSlotItem:
   - {fileID: 4438994701564762071}
   - {fileID: 1930169411}
@@ -701,34 +713,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 412480774070683085, guid: 3301955662848cf4d91f44911cffff9c, type: 3}
-      propertyPath: m_CellSize.x
-      value: 16
-      objectReference: {fileID: 0}
-    - target: {fileID: 412480774070683085, guid: 3301955662848cf4d91f44911cffff9c, type: 3}
-      propertyPath: m_CellSize.y
-      value: 16
-      objectReference: {fileID: 0}
-    - target: {fileID: 412480774070683085, guid: 3301955662848cf4d91f44911cffff9c, type: 3}
-      propertyPath: m_Padding.m_Top
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 412480774070683085, guid: 3301955662848cf4d91f44911cffff9c, type: 3}
-      propertyPath: m_Padding.m_Left
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 412480774070683085, guid: 3301955662848cf4d91f44911cffff9c, type: 3}
-      propertyPath: m_Padding.m_Right
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 412480774070683085, guid: 3301955662848cf4d91f44911cffff9c, type: 3}
-      propertyPath: m_Padding.m_Bottom
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 899595272224504949, guid: 3301955662848cf4d91f44911cffff9c, type: 3}
-      propertyPath: inventoryGrid
-      value: 
-      objectReference: {fileID: 1158890900}
     - target: {fileID: 1776012263308016586, guid: 3301955662848cf4d91f44911cffff9c, type: 3}
       propertyPath: m_Name
       value: ------ UI Manager ------
@@ -1021,11 +1005,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 244e3b6e9b2ff9942b69ce1c8c29b9d5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ShelfSlotItem
---- !u!224 &1158890900 stripped
-RectTransform:
-  m_CorrespondingSourceObject: {fileID: 679861229472454183, guid: 3301955662848cf4d91f44911cffff9c, type: 3}
-  m_PrefabInstance: {fileID: 860275785}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1214933726
 GameObject:
   m_ObjectHideFlags: 0

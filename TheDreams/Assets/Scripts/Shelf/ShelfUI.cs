@@ -77,11 +77,14 @@ public class ShelfUI : MonoBehaviour
         {
             int index = i;
 
+            InventorySlotData slot = currentShelf.slots[index];
             var ui = Instantiate(itemPrefab, shelfGrid);
 
             ui.SetData(
-                currentShelf.slots[index],
-                () => MoveFromShelf(index)
+                slot,
+                () => InventoryUI.Instance?.Select(slot),
+                () => MoveFromShelf(index),
+                InventoryUI.Instance != null && InventoryUI.Instance.Selected == slot
             );
         }
 
@@ -91,17 +94,32 @@ public class ShelfUI : MonoBehaviour
         {
             int index = i;
 
+            InventorySlotData slot = InventoryManager.Instance.slots[index];
             var ui = Instantiate(itemPrefab, inventoryGrid);
 
             ui.SetData(
-                InventoryManager.Instance.slots[index],
-                () => MoveFromInventory(index)
+                slot,
+                () => InventoryUI.Instance?.Select(slot),
+                () => MoveFromInventory(index),
+                InventoryUI.Instance != null && InventoryUI.Instance.Selected == slot
             );
         }
 
         currentShelf.RefreshVisuals();
         currentShelf.Remember();
         InventoryManager.CaptureActive();
+        InventoryUI.Instance?.OnSlotsChanged();
+    }
+
+    public void HighlightShelf(InventorySlotData slot)
+    {
+        InventoryItemUI.HighlightGrid(shelfGrid, slot);
+    }
+
+    public void RememberCurrent()
+    {
+        if (currentShelf != null)
+            currentShelf.Remember();
     }
 
     public void NotifyShelfChanged(ShelfInventory shelf)
@@ -116,6 +134,8 @@ public class ShelfUI : MonoBehaviour
     {
         if (currentShelf == null)
             return;
+
+        InventoryUI.Instance?.CommitSelectionPrice();
 
         bool moved = InventoryTransfer.Move(
             currentShelf.slots,
@@ -133,6 +153,8 @@ public class ShelfUI : MonoBehaviour
     {
         if (currentShelf == null)
             return;
+
+        InventoryUI.Instance?.CommitSelectionPrice();
 
         bool moved = InventoryTransfer.Move(
             InventoryManager.Instance.slots,

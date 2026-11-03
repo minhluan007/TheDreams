@@ -17,4 +17,5 @@ MonoBehaviour:
   icon: {fileID: 295685098, guid: 4dffbf2c34d864740ba4af2ebddc9aec, type: 3}
   maxStack: 99
   coinPrice: 2
+  coinPriceSell: 2
   description: "H\u1ED9p r\u1ED7ng.\nD\xF9ng \u0111\u1EC3 ch\u1EE9a v\u1EADt ph\u1EA9m."

@@ -88,23 +88,22 @@ public class ShelfInventory : MonoBehaviour
         return false;
     }
 
-    public bool TryTakeSlot(int index, out ItemData item)
+    public bool TryTakeSlot(int index, out ItemData item, out int sellPrice)
     {
         item = null;
+        sellPrice = 0;
         if (slots == null || index < 0 || index >= slots.Count)
             return false;
 
         InventorySlotData slot = slots[index];
-        if (slot == null || slot.item == null || slot.amount <= 0)
+        if (slot == null || !slot.HasItem)
             return false;
 
         item = slot.item;
+        sellPrice = slot.SellPrice;
         slot.amount--;
         if (slot.amount <= 0)
-        {
-            slot.item = null;
-            slot.amount = 0;
-        }
+            slot.Clear();
 
         RefreshVisuals();
         Remember();
@@ -196,7 +195,10 @@ public class ShelfInventory : MonoBehaviour
 
             var data = slots[i];
             bool hasItem = data != null && data.item != null && data.amount > 0;
-            shelfSlotItem[i].UpdateSprite(hasItem ? data.item.icon : null);
+            shelfSlotItem[i].Show(
+                hasItem ? data.item.icon : null,
+                hasItem ? data.SellPrice : 0,
+                hasItem);
         }
     }
 
@@ -222,6 +224,8 @@ public static class ShelfStock
         public string key;
         public ItemData[] items;
         public int[] amounts;
+        public int[] sellPrices;
+        public bool[] sellSet;
     }
 
     static readonly List<Record> records = new List<Record>();
@@ -236,14 +240,18 @@ public static class ShelfStock
         Record record = Find(Key(sceneName, shelfName), true);
         record.items = new ItemData[slots.Count];
         record.amounts = new int[slots.Count];
+        record.sellPrices = new int[slots.Count];
+        record.sellSet = new bool[slots.Count];
         for (int i = 0; i < slots.Count; i++)
         {
             InventorySlotData slot = slots[i];
-            if (slot == null || slot.item == null || slot.amount <= 0)
+            if (slot == null || !slot.HasItem)
                 continue;
 
             record.items[i] = slot.item;
             record.amounts[i] = slot.amount;
+            record.sellPrices[i] = slot.coinPriceSell;
+            record.sellSet[i] = slot.sellPriceSet;
         }
     }
 
@@ -265,13 +273,17 @@ public static class ShelfStock
 
             if (record.items[i] == null || record.amounts[i] <= 0)
             {
-                slot.item = null;
-                slot.amount = 0;
+                slot.Clear();
                 continue;
             }
 
             slot.item = record.items[i];
             slot.amount = record.amounts[i];
+            bool priced = record.sellSet != null && i < record.sellSet.Length && record.sellSet[i];
+            slot.sellPriceSet = priced;
+            slot.coinPriceSell = priced && record.sellPrices != null && i < record.sellPrices.Length
+                ? record.sellPrices[i]
+                : 0;
         }
     }
 
@@ -294,9 +306,10 @@ public static class ShelfStock
         return false;
     }
 
-    public static bool TryTakeAny(string sceneName, out ItemData item)
+    public static bool TryTakeAny(string sceneName, out ItemData item, out int sellPrice)
     {
         item = null;
+        sellPrice = 0;
         string prefix = sceneName + "/";
         for (int i = 0; i < records.Count; i++)
         {
@@ -310,11 +323,14 @@ public static class ShelfStock
                     continue;
 
                 item = record.items[s];
+                sellPrice = PriceAt(record, s, item);
                 record.amounts[s]--;
                 if (record.amounts[s] <= 0)
                 {
                     record.items[s] = null;
                     record.amounts[s] = 0;
+                    if (record.sellSet != null && s < record.sellSet.Length)
+                        record.sellSet[s] = false;
                 }
 
                 return true;
@@ -322,6 +338,22 @@ public static class ShelfStock
         }
 
         return false;
+    }
+
+    static int PriceAt(Record record, int index, ItemData item)
+    {
+        if (record.sellSet != null && index < record.sellSet.Length && record.sellSet[index])
+        {
+            int price = record.sellPrices != null && index < record.sellPrices.Length
+                ? record.sellPrices[index]
+                : 0;
+            return Mathf.Max(0, price);
+        }
+
+        if (item == null)
+            return 0;
+
+        return Mathf.Max(0, item.coinPriceSell);
     }
 
     static Record Find(string key, bool create)
@@ -377,7 +409,9 @@ public static class ShelfStock
                 slots[s] = new SavedSlot
                 {
                     itemId = InventoryManager.ItemKey(item),
-                    amount = amount
+                    amount = amount,
+                    coinPriceSell = record.sellPrices != null && s < record.sellPrices.Length ? record.sellPrices[s] : 0,
+                    sellPriceSet = record.sellSet != null && s < record.sellSet.Length && record.sellSet[s]
                 };
             }
 
@@ -409,7 +443,9 @@ public static class ShelfStock
             {
                 key = shelf.key,
                 items = new ItemData[count],
-                amounts = new int[count]
+                amounts = new int[count],
+                sellPrices = new int[count],
+                sellSet = new bool[count]
             };
 
             for (int s = 0; s < count; s++)
@@ -424,6 +460,8 @@ public static class ShelfStock
 
                 record.items[s] = item;
                 record.amounts[s] = slot.amount;
+                record.sellPrices[s] = slot.coinPriceSell;
+                record.sellSet[s] = slot.sellPriceSet;
             }
 
             records.Add(record);

@@ -17,4 +17,5 @@ MonoBehaviour:
   icon: {fileID: 6281809827495714094, guid: 4dffbf2c34d864740ba4af2ebddc9aec, type: 3}
   maxStack: 20
   coinPrice: 60
+  coinPriceSell: 60
   description: "Mũ dày hơn.\nGiữ ấm khi trời lạnh."
