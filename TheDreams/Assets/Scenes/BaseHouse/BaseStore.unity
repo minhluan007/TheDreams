@@ -789,7 +789,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5979987422299558252, guid: 49fbb95a3335b8943917ddce829233fc, type: 3}
       propertyPath: m_Name
-      value: ------ ShopJungle ------
+      value: ------ ShopGuest ------
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
