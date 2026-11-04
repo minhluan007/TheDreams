@@ -241,6 +241,36 @@ public class InventoryManager : MonoBehaviour
         RefreshUI();
     }
 
+    public int RoomFor(ItemData item)
+    {
+        if (item == null || slots == null)
+            return 0;
+
+        int maxStack = Mathf.Max(1, item.maxStack);
+        int room = 0;
+        for (int i = 0; i < slots.Count; i++)
+        {
+            InventorySlotData slot = slots[i];
+            if (slot == null)
+                continue;
+
+            if (slot.item == null || slot.amount <= 0)
+                room += maxStack;
+            else if (slot.item == item && slot.amount < maxStack)
+                room += maxStack - slot.amount;
+        }
+
+        return room;
+    }
+
+    public bool CanAdd(ItemData item, int amount)
+    {
+        if (amount <= 0)
+            return true;
+
+        return RoomFor(item) >= amount;
+    }
+
     public int AddItem(ItemData item, int amount)
     {
         if (item == null)
