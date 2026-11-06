@@ -11,6 +11,9 @@ public class InventoryDetailView : MonoBehaviour
     TMP_Text descriptionLabel;
     TMP_Text coinLabel;
     TMP_InputField sellInput;
+    Button actionButton;
+    TMP_Text actionLabel;
+    GameObject actionRoot;
     bool built;
     bool ignoreInput;
 
@@ -63,6 +66,8 @@ public class InventoryDetailView : MonoBehaviour
             sellInput.text = slot.SellPrice.ToString();
             ignoreInput = false;
         }
+
+        ConfigureAction(item);
     }
 
     public void Commit()
@@ -81,9 +86,54 @@ public class InventoryDetailView : MonoBehaviour
         current.SetSellPrice(price);
     }
 
+    void ConfigureAction(ItemData item)
+    {
+        if (actionRoot == null || actionLabel == null)
+            return;
+
+        if (item is PotItemData)
+        {
+            actionRoot.SetActive(true);
+            actionLabel.text = "Đặt chậu";
+            return;
+        }
+
+        if (item is SeedItemData)
+        {
+            actionRoot.SetActive(true);
+            actionLabel.text = "Giao hạt";
+            return;
+        }
+
+        actionRoot.SetActive(false);
+    }
+
+    void OnActionClicked()
+    {
+        if (current == null || !current.HasItem)
+            return;
+
+        ItemPut put = ItemPut.EnsureOnPlayer();
+        if (put == null)
+            return;
+
+        if (current.item is PotItemData pot)
+        {
+            put.BeginPlacePot(pot);
+            return;
+        }
+
+        if (current.item is SeedItemData seed)
+            put.BeginDeliverSeed(seed);
+    }
+
     void CreateView()
     {
         int layer = gameObject.layer;
+        Transform existing = transform.Find("ItemDetail");
+        if (existing != null)
+            DestroyImmediate(existing.gameObject);
+
         root = CreateRect("ItemDetail", transform, layer);
         root.gameObject.SetActive(false);
 
@@ -105,20 +155,41 @@ public class InventoryDetailView : MonoBehaviour
         descriptionLabel.color = new Color(0.82f, 0.9f, 1f, 1f);
         descriptionLabel.textWrappingMode = TextWrappingModes.Normal;
         descriptionLabel.overflowMode = TextOverflowModes.Ellipsis;
-        StretchBetween(descriptionLabel.rectTransform, 0f, 24f, 0f, 20f);
+        StretchBetween(descriptionLabel.rectTransform, 0f, 38f, 0f, 20f);
 
         coinLabel = CreateText("CoinPrice", root, layer, 5f, FontStyles.Bold, TextAlignmentOptions.MidlineLeft);
         coinLabel.color = new Color(1f, 0.9f, 0.45f, 1f);
-        SetBottomStretch(coinLabel.rectTransform, 0f, 12f, 12f);
+        SetBottomStretch(coinLabel.rectTransform, 0f, 26f, 12f);
 
         TMP_Text sellLabel = CreateText("SellLabel", root, layer, 5f, FontStyles.Bold, TextAlignmentOptions.MidlineLeft);
         sellLabel.text = "Sell";
-        SetBottomLeft(sellLabel.rectTransform, 0f, 0f, 28f, 12f);
+        SetBottomLeft(sellLabel.rectTransform, 0f, 14f, 28f, 12f);
 
         sellInput = CreateInput(root, layer);
-        SetBottomLeft(sellInput.GetComponent<RectTransform>(), 30f, 0f, 48f, 12f);
+        SetBottomLeft(sellInput.GetComponent<RectTransform>(), 30f, 14f, 48f, 12f);
         sellInput.onEndEdit.AddListener(OnSellEdited);
         sellInput.onValueChanged.AddListener(OnSellEdited);
+
+        actionRoot = new GameObject("ActionButton", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(Button));
+        actionRoot.layer = layer;
+        actionRoot.transform.SetParent(root, false);
+        Image actionImage = actionRoot.GetComponent<Image>();
+        actionImage.color = new Color(0.25f, 0.62f, 0.38f, 1f);
+        actionImage.raycastTarget = true;
+        RectTransform actionRect = (RectTransform)actionRoot.transform;
+        SetBottomStretch(actionRect, 0f, 0f, 12f);
+
+        actionLabel = CreateText("Label", actionRoot.transform, layer, 5f, FontStyles.Bold, TextAlignmentOptions.Center);
+        StretchFull(actionLabel.rectTransform, 2f, 0f, 2f, 0f);
+        actionLabel.text = "Đặt chậu";
+
+        actionButton = actionRoot.GetComponent<Button>();
+        actionButton.targetGraphic = actionImage;
+        actionButton.onClick.AddListener(OnActionClicked);
+        Navigation navigation = actionButton.navigation;
+        navigation.mode = Navigation.Mode.None;
+        actionButton.navigation = navigation;
+        actionRoot.SetActive(false);
     }
 
     void OnSellEdited(string raw)
@@ -141,8 +212,8 @@ public class InventoryDetailView : MonoBehaviour
         float panelBottom = -panelRect.sizeDelta.y * panelRect.pivot.y;
         float top = gridBottom - 3f;
         float height = top - (panelBottom + 4f);
-        if (height < 36f)
-            height = 36f;
+        if (height < 48f)
+            height = 48f;
 
         root.anchorMin = new Vector2(0.5f, 0.5f);
         root.anchorMax = new Vector2(0.5f, 0.5f);

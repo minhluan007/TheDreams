@@ -9,6 +9,8 @@ public class PlayerMove : MonoBehaviour
     public InputActionAsset inputActions;
 
     InputAction moveAction;
+    bool externalControl;
+    Vector2 externalMove;
 
     void Awake()
     {
@@ -38,11 +40,33 @@ public class PlayerMove : MonoBehaviour
             animator = GetComponent<Animator>();
     }
 
+    public void SetExternalControl(bool enabled)
+    {
+        externalControl = enabled;
+        if (!enabled)
+            externalMove = Vector2.zero;
+    }
+
+    public void ApplyExternalMotion(Vector2 direction)
+    {
+        externalMove = direction;
+        float speed = direction.magnitude;
+        if (animator != null)
+        {
+            SetAnimation("Run", speed);
+            SetAnimation("Idle", 1f - speed);
+        }
+
+        SetDirection(direction.x);
+    }
+
     void Update()
     {
+        if (externalControl)
+            return;
+
         Vector2 move = GetMove();
         float speed = move.magnitude;
-        bool isMoving = speed > 0.01f;
 
         if (animator != null)
         {
@@ -55,13 +79,16 @@ public class PlayerMove : MonoBehaviour
 
     void FixedUpdate()
     {
+        if (externalControl)
+            return;
+
         Vector2 move = GetMove();
         rb.linearVelocity = move * moveSpeed;
     }
 
     Vector2 GetMove()
     {
-        return moveAction.ReadValue<Vector2>();
+        return moveAction != null ? moveAction.ReadValue<Vector2>() : Vector2.zero;
     }
 
     void SetAnimation(string animationName, float value)

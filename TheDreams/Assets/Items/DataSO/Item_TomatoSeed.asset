@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b2c3d4e5f6789010abcdef0000000002, type: 3}
+  m_Name: Item_TomatoSeed
+  m_EditorClassIdentifier: Assembly-CSharp::SeedItemData
+  itemId: seed_tomato
+  itemName: Tomato Seed
+  icon: {fileID: -315227117664273097, guid: 2be3077eb39d4f34fb3d0ea7645e98dc, type: 3}
+  maxStack: 99
+  coinPrice: 5
+  coinPriceSell: 0
+  description: 'Hat giong ca chua.
+
+    Chi dung de trong cay.'
+  plantingOnly: 1
+  stages:
+  - sprite: {fileID: -315227117664273097, guid: 2be3077eb39d4f34fb3d0ea7645e98dc, type: 3}
+    daysFromPlanting: 0
+  - sprite: {fileID: -6357818720139401211, guid: 2be3077eb39d4f34fb3d0ea7645e98dc, type: 3}
+    daysFromPlanting: 2
+  - sprite: {fileID: 275085775013980216, guid: 2be3077eb39d4f34fb3d0ea7645e98dc, type: 3}
+    daysFromPlanting: 3
+  - sprite: {fileID: -3934602689145061536, guid: 2be3077eb39d4f34fb3d0ea7645e98dc, type: 3}
+    daysFromPlanting: 4
+  - sprite: {fileID: -1621878993, guid: 2be3077eb39d4f34fb3d0ea7645e98dc, type: 3}
+    daysFromPlanting: 5
+  plantOffset: {x: 0, y: 0.55}
+  plantScale: 2
+  growthStages: []
+  daysPerStage: 
+  daysPerStageDefault: 1

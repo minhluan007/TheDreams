@@ -182,6 +182,28 @@ public class InventoryManager : MonoBehaviour
         return null;
     }
 
+    public void RegisterItem(ItemData item)
+    {
+        if (item == null)
+            return;
+
+        if (itemDatabase == null)
+            itemDatabase = new List<ItemData>();
+
+        string key = ItemKey(item);
+        for (int i = 0; i < itemDatabase.Count; i++)
+        {
+            ItemData existing = itemDatabase[i];
+            if (existing == null)
+                continue;
+
+            if (existing == item || ItemKey(existing) == key)
+                return;
+        }
+
+        itemDatabase.Add(item);
+    }
+
     public void RemoveItem(ItemData item, int amount)
     {
         if (item == null)

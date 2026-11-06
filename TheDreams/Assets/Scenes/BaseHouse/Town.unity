@@ -238,6 +238,89 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: df0da4ab42a538d489e0acb386181b53, type: 3}
+--- !u!1 &910040001
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 910040002}
+  - component: {fileID: 910040003}
+  - component: {fileID: 910040004}
+  m_Layer: 0
+  m_Name: ------ Planting Demo ------
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &910040002
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 910040001}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 6.5, y: -25.1, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &910040003
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 910040001}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3789010abcdef0000000000000000009, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlantingHierarchyGuide
+  hierarchyNotes: "TRONG CAY / CHAU (Town demo)\r\n\r\n------ Item Data ------\r\nCreate
+    > The Dreams/Inventory/Seed  -> SeedItemData (chi de trong)\r\nCreate > The Dreams/Inventory/Pot  
+    -> PotItemData (chi de dat chau)\r\nItem_EmptyPot: PotItemData + gan potPrefab
+    = Prefab PlantBed_Pot\r\nItem_TomatoSeed: SeedItemData + gan growthStages (TomatoPlant_0..4)\r\n\r\n------
+    Prefab PlantBed ------\r\nPlantBed_Soil / PlantBed_Pot\r\n  SpriteRenderer (dat/chau)\r\n 
+    BoxCollider2D IsTrigger ~ 1.2 x 1.2\r\n  PlantBed.cs\r\n    kind = Soil | Pot\r\n   
+    bedId (unique trong scene)\r\n  PlantVisual (child, tu tao neu thieu)\r\n\r\n------
+    Snap dat chau ------\r\nPutSnap_1  [Empty + PutSnapPoint]\r\n  accepts = Pot\r\n 
+    Gizmo hinh tron xanh = trong\r\n\r\n------ Player ------\r\nThem ItemPut.cs (PlantingDemoSetup
+    tu them)\r\n  F + chon Pot trong inventory  -> snap dat chau\r\n  F + chon Seed                
+    -> trong vao bed gan nhat\r\n  E dung gan PlantBed + chon Seed -> trong\r\n\r\n------
+    Demo Town ------\r\nObject: ------ Planting Demo ------\r\n  PlantingHierarchyGuide\r\n 
+    PlantingDemoSetup  (Play mode spawn snap/soil/pickup neu thieu)\r\n\r\n------
+    Choi thu ------\r\n1. Nhat Empty Pot / Tomato Seed (E)\r\n2. Mo Inv, click chon
+    item\r\n3. Dung gan PutSnap, bam F de dat chau\r\n4. Chon Seed, bam F (hoac E
+    gan bed) de trong\r\n5. Bam N (demo) de +1 ngay, xem cay lon\r\n6. Save/Load
+    de kiem tra PlantWorld + lich\r\n\r\n------ LifeTime ------\r\nNgay / Thang /
+    Nam thu 1, 2, ... (khong dung nam duong lich)\r\nHet 24:00 -> sang ngay moi.
+    Cay tinh theo AbsoluteDay.\r\nUI LifeTimePanel: DayText, MonthText, YearText,
+    TimeText."
+--- !u!114 &910040004
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 910040001}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4789010abcdef000000000000000000a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlantingDemoSetup
+  potItem: {fileID: 11400000, guid: 31879c5b35e20704183c28184c7490a7, type: 2}
+  seedItem: {fileID: 11400000, guid: 9a1b2c3d4e5f6789010abcdef00000b1, type: 2}
+  potPrefab: {fileID: 1001000001, guid: a0b1c2d3e4f5061728394a5b6c7d8e9f, type: 3}
+  buildIfMissing: 1
+  giveStartingItems: 1
+  advanceDayKey: 18
 --- !u!1001 &1216642502
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -346,6 +429,10 @@ PrefabInstance:
     - target: {fileID: 3683338641350241123, guid: 3301955662848cf4d91f44911cffff9c, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7103847561928374650, guid: 3301955662848cf4d91f44911cffff9c, type: 3}
+      propertyPath: realSecondsPerGameHour
+      value: 10
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -670,6 +757,63 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!1001 &2457947155523289806
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 151724390644767546, guid: d1f31b66c257df740b173b4a450233e5, type: 3}
+      propertyPath: m_Name
+      value: Tree Tomato
+      objectReference: {fileID: 0}
+    - target: {fileID: 5293674485195665591, guid: d1f31b66c257df740b173b4a450233e5, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -9.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5293674485195665591, guid: d1f31b66c257df740b173b4a450233e5, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -25.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5293674485195665591, guid: d1f31b66c257df740b173b4a450233e5, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5293674485195665591, guid: d1f31b66c257df740b173b4a450233e5, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5293674485195665591, guid: d1f31b66c257df740b173b4a450233e5, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5293674485195665591, guid: d1f31b66c257df740b173b4a450233e5, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5293674485195665591, guid: d1f31b66c257df740b173b4a450233e5, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5293674485195665591, guid: d1f31b66c257df740b173b4a450233e5, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5293674485195665591, guid: d1f31b66c257df740b173b4a450233e5, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5293674485195665591, guid: d1f31b66c257df740b173b4a450233e5, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: d1f31b66c257df740b173b4a450233e5, type: 3}
 --- !u!114 &3599045063224162413
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -821,3 +965,5 @@ SceneRoots:
   - {fileID: 1350988640}
   - {fileID: 1216642502}
   - {fileID: 1319998183704005387}
+  - {fileID: 2457947155523289806}
+  - {fileID: 910040002}

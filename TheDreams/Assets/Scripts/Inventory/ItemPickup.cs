@@ -12,15 +12,35 @@ public class ItemPickup : MonoBehaviour
     private SpriteRenderer spriteRenderer;
     private bool playerInRange;
     private string takenKey;
+    private bool memoryChecked;
+
+    public ItemData Item => item;
+    public int Amount => amount;
+
+    public void Setup(ItemData data, int count)
+    {
+        item = data;
+        amount = Mathf.Max(1, count);
+        if (spriteRenderer == null)
+            spriteRenderer = GetComponent<SpriteRenderer>();
+
+        ApplyVisual();
+        CheckTaken();
+    }
 
     private void Awake()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
         ApplyVisual();
+        CheckTaken();
+    }
 
-        if (item == null)
+    void CheckTaken()
+    {
+        if (memoryChecked || item == null)
             return;
 
+        memoryChecked = true;
         takenKey = PickupMemory.Key(gameObject.scene.name, transform.position, item);
         if (!PickupMemory.IsTaken(takenKey))
             return;
