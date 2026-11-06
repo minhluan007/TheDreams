@@ -287,7 +287,7 @@ TextureImporter:
         width: 32
         height: 32
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -296,6 +296,50 @@ TextureImporter:
       bones: []
       spriteID: 7d313b97a0f51d34a94cf5564cf3be9b
       internalID: 1485259727
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Art#Items_8
+      rect:
+        serializedVersion: 2
+        x: 48
+        y: 16
+        width: 48
+        height: 48
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: dc230327043eb7341a3abe79adee8b29
+      internalID: -1671539970
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Art#Items_9
+      rect:
+        serializedVersion: 2
+        x: 96
+        y: 64
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c52cc1581ec743044afedd9a1776d4f4
+      internalID: 718972568
       vertices: []
       indices: 
       edges: []
@@ -324,6 +368,8 @@ TextureImporter:
       Art#Items_5: 2042549239
       Art#Items_6: 295685098
       Art#Items_7: 1485259727
+      Art#Items_8: -1671539970
+      Art#Items_9: 718972568
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

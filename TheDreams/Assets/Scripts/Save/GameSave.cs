@@ -22,17 +22,21 @@ public class SavedShelf
 [Serializable]
 public class GameSaveData
 {
-    public int version = 2;
+    public int version = 3;
     public string sceneName;
     public bool hasPlayer;
     public float x;
     public float y;
     public float z;
     public float hour;
+    public int day = 1;
+    public int month = 1;
+    public int year = 1;
     public int coins;
     public SavedSlot[] inventory;
     public SavedShelf[] shelves;
     public string[] pickups;
+    public SavedPlantBed[] plants;
 }
 
 public static class GameSave
@@ -61,18 +65,24 @@ public static class GameSave
     {
         ShelfInventory.RememberLoaded();
         InventoryManager.CaptureActive();
+        PlantWorld.RememberAllLive();
 
         GameObject player = GameObject.FindGameObjectWithTag("Player");
+        LifeTime clock = LifeTime.Ensure();
         GameSaveData data = new GameSaveData
         {
-            version = 2,
+            version = 3,
             sceneName = SceneManager.GetActiveScene().name,
             hasPlayer = player != null,
-            hour = LifeTime.HourNow,
+            hour = clock.Hour,
+            day = clock.Day,
+            month = clock.Month,
+            year = clock.Year,
             coins = PlayerCoin.Amount,
             inventory = InventoryManager.ExportActive(),
             shelves = ShelfStock.Export(),
-            pickups = PickupMemory.Export()
+            pickups = PickupMemory.Export(),
+            plants = PlantWorld.Export()
         };
 
         if (player != null)
@@ -123,7 +133,7 @@ public static class GameSave
         pending = data;
         InventoryManager.Store(data.inventory);
         PickupMemory.Replace(data.pickups);
-        LifeTime.SetHour(data.hour);
+        ApplyCalendar(data);
         ApplyCoins(data);
         ShelfStock.Invalidate();
 
@@ -142,11 +152,10 @@ public static class GameSave
         pending = null;
         PickupMemory.Clear();
         ShelfStock.Clear();
+        PlantWorld.Clear();
         InventoryManager.PrepareNewGame();
         PlayerCoin.BeginNewGame();
-
-        LifeTime clock = LifeTime.Ensure();
-        LifeTime.SetHour(clock.DayStartHour);
+        LifeTime.ResetCalendar();
     }
 
     public static void DeleteSave()
@@ -174,14 +183,23 @@ public static class GameSave
         ItemPickup.HideTaken();
         ShelfStock.Import(data.shelves, ResolveItem);
         ShelfInventory.ApplyRemembered();
-        LifeTime.SetHour(data.hour);
+        ApplyCalendar(data);
         ApplyCoins(data);
+        PlantWorld.Import(data.plants, ResolveItem);
 
         if (data.hasPlayer)
             PlacePlayer(new Vector3(data.x, data.y, data.z));
 
         if (ShelfUI.Instance != null && ShelfUI.Instance.IsOpen)
             ShelfUI.Instance.Refresh();
+    }
+
+    static void ApplyCalendar(GameSaveData data)
+    {
+        int day = data.version >= 3 ? Mathf.Max(1, data.day) : 1;
+        int month = data.version >= 3 ? Mathf.Max(1, data.month) : 1;
+        int year = data.version >= 3 ? Mathf.Max(1, data.year) : 1;
+        LifeTime.SetCalendar(year, month, day, data.hour);
     }
 
     static void PlacePlayer(Vector3 position)

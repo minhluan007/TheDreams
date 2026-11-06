@@ -11,6 +11,7 @@ public class InventoryUI : MonoBehaviour
     InventoryDetailView detail;
 
     public InventorySlotData Selected => selected;
+    public bool IsOpen => panel != null && panel.activeSelf;
 
     private void Awake()
     {
@@ -20,22 +21,33 @@ public class InventoryUI : MonoBehaviour
 
     private void Start()
     {
-        panel.SetActive(false);
+        if (panel != null)
+            panel.SetActive(false);
     }
 
     public void Toggle()
     {
-        bool isOpen = panel.activeSelf;
-        panel.SetActive(!isOpen);
-
-        if (!isOpen)
-            Refresh();
+        if (IsOpen)
+            Close();
+        else
+            Open();
     }
 
     public void Open()
     {
+        if (panel == null)
+            return;
+
         panel.SetActive(true);
         Refresh();
+    }
+
+    public void Close()
+    {
+        if (panel == null)
+            return;
+
+        panel.SetActive(false);
     }
 
     public void Select(InventorySlotData slot)
@@ -43,6 +55,7 @@ public class InventoryUI : MonoBehaviour
         selected = slot != null && slot.HasItem ? slot : null;
         detail?.Show(selected);
         Highlight();
+        NotifyPlacePreview();
     }
 
     public void CommitSelectionPrice()
@@ -59,6 +72,7 @@ public class InventoryUI : MonoBehaviour
 
         detail?.Show(selected);
         Highlight();
+        NotifyPlacePreview();
     }
 
     public void Refresh()
@@ -73,6 +87,12 @@ public class InventoryUI : MonoBehaviour
 
         RebuildInventory();
         OnSlotsChanged();
+    }
+
+    void NotifyPlacePreview()
+    {
+        ItemPut put = ItemPut.Instance != null ? ItemPut.Instance : ItemPut.EnsureOnPlayer();
+        put?.OnInventorySelection(selected);
     }
 
     void RebuildInventory()
